@@ -1,0 +1,1 @@
+"""arXiv search MCP server."""

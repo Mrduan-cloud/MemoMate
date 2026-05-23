@@ -1,0 +1,42 @@
+[project]
+name = "memomate"
+version = "0.1.0"
+description = "Memory MCP Server for AI assistants, alongside a growing collection of utility MCP Servers"
+authors = [{ name = "Duan Xinxin" }]
+requires-python = ">=3.11"
+readme = "README.md"
+license = { text = "MIT" }
+keywords = ["mcp", "memory", "agent", "llm", "rag"]
+dependencies = [
+    "mcp>=1.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.6",
+]
+
+[project.scripts]
+memomate-core = "core.server:main"
+memomate-arxiv = "servers.arxiv_search.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["core", "servers"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

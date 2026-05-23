@@ -1,0 +1,13 @@
+{
+  "_comment": "Drop the mcpServers entries below into your ~/.claude.json (or run `claude mcp add`).",
+  "mcpServers": {
+    "memomate": {
+      "command": "uv",
+      "args": ["run", "--directory", "D:/project/MemoMate", "memomate-core"]
+    },
+    "memomate-arxiv": {
+      "command": "uv",
+      "args": ["run", "--directory", "D:/project/MemoMate", "memomate-arxiv"]
+    }
+  }
+}
