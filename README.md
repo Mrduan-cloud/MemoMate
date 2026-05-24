@@ -16,7 +16,7 @@ Together they demonstrate end-to-end MCP development: breadth (many tools) and d
 | Server | Status | What it does |
 |---|---|---|
 | [`arxiv_search`](servers/arxiv_search/) | working | Search arXiv papers via the public Atom API (zero dependencies) |
-| [`bilibili_search`](servers/bilibili_search/) | scaffold | Search B站 videos by keyword |
+| [`bilibili_search`](servers/bilibili_search/) | working | Search B站 videos + fetch video info (zero dependencies) |
 | [`zhihu_search`](servers/zhihu_search/) | scaffold | Search 知乎 questions & answers |
 | [`wechat_mp`](servers/wechat_mp/) | scaffold | Read public 微信公众号 articles |
 

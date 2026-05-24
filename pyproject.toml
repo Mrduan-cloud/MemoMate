@@ -21,6 +21,7 @@ dev = [
 [project.scripts]
 memomate-core = "core.server:main"
 memomate-arxiv = "servers.arxiv_search.server:main"
+memomate-bilibili = "servers.bilibili_search.server:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -39,4 +40,7 @@ ignore = ["E501"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+addopts = "-q -m 'not network'"
+markers = [
+    "network: tests that require live network access (deselected by default)",
+]

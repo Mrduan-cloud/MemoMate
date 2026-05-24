@@ -17,7 +17,7 @@ Each server should:
 | Folder | Status | Description |
 |---|---|---|
 | [`arxiv_search`](arxiv_search/) | working | Search arXiv papers (stdlib only, no auth) |
-| [`bilibili_search`](bilibili_search/) | scaffold | Search B站 videos |
+| [`bilibili_search`](bilibili_search/) | working | Search B站 videos + fetch video info (stdlib only, no auth) |
 | [`zhihu_search`](zhihu_search/) | scaffold | Search 知乎 questions / answers |
 | [`wechat_mp`](wechat_mp/) | scaffold | Fetch public 微信公众号 article content |
 
