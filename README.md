@@ -22,13 +22,81 @@ Together they demonstrate end-to-end MCP development: breadth (many tools) and d
 
 Each server is a self-contained folder. New servers ship as part of the daily iteration plan.
 
-### Plug into Claude Code
+For setup instructions across all IDEs (Cursor, Claude Code, Trae, CodeBuddy, 通义灵码, ...), see **[Plug into your AI IDE](#plug-into-your-ai-ide)** below.
 
-```bash
-claude mcp add memomate-arxiv --scope user -- uv run --directory D:/project/MemoMate memomate-arxiv
+---
+
+## Why MemoMate for 中国 AI IDE users?
+
+International AI coding tools (Cursor, Claude Code, Cline) excel at code generation but their MCP ecosystems are heavily Western-centric — arXiv, GitHub, npm, Stack Overflow. Chinese developers regularly need things those don't cover:
+
+- 搜 **B站 / 知乎 / 微信公众号** for technical articles and tutorials
+- Look up **12306 train schedules**, **高德地图 routes**, **豆瓣 ratings**
+- Query **国内 SaaS** like Notion-国内, 飞书, 钉钉
+- Read **arxiv-CN mirror / 中国知网** instead of the slow international arXiv
+
+**MemoMate's `servers/` collection is built to fill exactly this gap.** Each server is a small, focused MCP server for one Chinese-ecosystem tool. Any MCP-compatible IDE plugs them in the same way.
+
+| 你常用的场景 | 对应 MemoMate server | 状态 |
+|---|---|---|
+| 找 B 站视频教程 | `bilibili_search` | ✅ working |
+| 查 arXiv 论文 | `arxiv_search` | ✅ working |
+| 搜知乎技术回答 | `zhihu_search` | 🚧 planned (W03) |
+| 读公众号长文 | `wechat_mp` | 🚧 planned (W04) |
+| 查火车票 / 排班 | `12306` | 🚧 planned (W07) |
+| 看 GitHub 热门 | `github_trending` | 🚧 planned (W06) |
+| 查豆瓣电影 / 书评 | `douban` | 🚧 planned (W08) |
+| 查中国天气 | `weather_cn` | 🚧 planned (W06) |
+| 搜 HackerNews | `hackernews` | 🚧 planned (W06) |
+| 总结 arXiv 论文（本地 LLM） | `arxiv_summary` | 🚧 planned (W09) |
+| 查 Notion workspace | `notion_query` | 🚧 planned (W11) |
+
+If you're using **Trae / CodeBuddy / 通义灵码 IDE / Cursor / Claude Code** and you want your AI to *"找一下 B 站讲 LangGraph 的视频"* or *"搜知乎上关于 RAG 评测的回答"* — MemoMate is built exactly for you.
+
+### Plug into your AI IDE
+
+The MCP JSON structure is **identical across all clients** (it's protocol-standard) — only the file location and the UI for editing it differ.
+
+**Canonical config (drop this anywhere `mcpServers` is accepted)**:
+
+```json
+{
+  "mcpServers": {
+    "memomate-bilibili": {
+      "command": "uv",
+      "args": ["run", "--directory", "D:/project/MemoMate", "memomate-bilibili"]
+    },
+    "memomate-arxiv": {
+      "command": "uv",
+      "args": ["run", "--directory", "D:/project/MemoMate", "memomate-arxiv"]
+    },
+    "memomate": {
+      "command": "uv",
+      "args": ["run", "--directory", "D:/project/MemoMate", "memomate-core"]
+    }
+  }
+}
 ```
 
-Then ask: *"Find the 3 most recent papers on RAG evaluation."*
+#### Where to put it, per IDE
+
+| IDE | 配置位置 | 备注 |
+|---|---|---|
+| **Cursor** | `~/.cursor/mcp.json` (or `.cursor/mcp.json` per-project) | Edit the file directly, then restart Cursor |
+| **Claude Code** | `~/.claude.json` (or use `claude mcp add` CLI) | Recommended: use the CLI, see below |
+| **Trae** (字节跳动) | 设置 → AI 模型 / MCP Servers (具体菜单随版本变化) | 粘贴上方 `mcpServers` 内的条目；或参考 [Trae 官方文档](https://docs.trae.ai/) |
+| **CodeBuddy** (腾讯) | 设置 → Extensions → MCP Servers | 添加 stdio 类型，命令 + 参数照 JSON 转写到 UI |
+| **通义灵码 IDE** (阿里) | 设置 → AI 增强 → MCP 服务器 | 新增 → stdio → 同上 |
+| **Cline / Continue / Zed** (VSCode/JetBrains 系) | 各自的 settings.json `mcpServers` 字段 | 格式相同 |
+
+**Claude Code CLI**（推荐）:
+
+```bash
+claude mcp add memomate-bilibili --scope user \
+  -- uv run --directory D:/project/MemoMate memomate-bilibili
+```
+
+> 这是 MemoMate 的核心价值——**同一个 server，所有 IDE 通用**。在 Cursor 里搜的 B 站视频，记忆了的 `save_memory`，下次切到通义灵码 IDE 直接 `recall_memory` 能取出来。
 
 ---
 
@@ -90,15 +158,9 @@ uv run memomate-core
 uv run memomate-arxiv
 ```
 
-### Register with Claude Code (user-global)
+### Register with your AI IDE
 
-```bash
-# Memory server (only if you decided you want it — see comparison above)
-claude mcp add memomate --scope user -- uv run --directory $(pwd) memomate-core
-
-# Utility servers (recommended for all)
-claude mcp add memomate-arxiv --scope user -- uv run --directory $(pwd) memomate-arxiv
-```
+See **[Plug into your AI IDE](#plug-into-your-ai-ide)** above for full instructions covering Cursor, Claude Code, Trae, CodeBuddy, 通义灵码 IDE, Cline, Continue, and Zed.
 
 ---
 
