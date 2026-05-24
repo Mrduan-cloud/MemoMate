@@ -1,81 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 280" width="1200" height="280">
   <defs>
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#4c1d95"/>
-      <stop offset="50%" stop-color="#7c3aed"/>
+      <stop offset="55%" stop-color="#7c3aed"/>
       <stop offset="100%" stop-color="#a78bfa"/>
     </linearGradient>
     <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
       <circle cx="20" cy="20" r="1.5" fill="white" opacity="0.12"/>
     </pattern>
+    <radialGradient id="glow" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="white" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0"/>
+    </radialGradient>
   </defs>
 
-  <rect width="1200" height="300" fill="url(#bgGrad)"/>
-  <rect width="1200" height="300" fill="url(#dots)"/>
+  <rect width="1200" height="280" fill="url(#bgGrad)"/>
+  <rect width="1200" height="280" fill="url(#dots)"/>
+  <rect width="1200" height="280" fill="url(#glow)"/>
 
-  <!-- Left network of MCP servers (arxiv/bilibili/zhihu/wechat) -->
-  <g opacity="0.45" stroke="#fff" stroke-width="1.6" fill="none">
-    <line x1="180" y1="80" x2="320" y2="160"/>
-    <line x1="320" y1="160" x2="180" y2="240"/>
-    <line x1="320" y1="160" x2="470" y2="80"/>
-    <line x1="320" y1="160" x2="470" y2="240"/>
-  </g>
-  <g fill="#fff" opacity="0.85">
-    <circle cx="180" cy="80" r="14"/>
-    <circle cx="180" cy="240" r="14"/>
-    <circle cx="320" cy="160" r="18"/>
-    <circle cx="470" cy="80" r="14"/>
-    <circle cx="470" cy="240" r="14"/>
-  </g>
-  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif"
-     font-size="11" fill="#4c1d95" text-anchor="middle" font-weight="700">
-    <text x="180" y="84">arXiv</text>
-    <text x="180" y="244">B站</text>
-    <text x="320" y="164">core</text>
-    <text x="470" y="84">知乎</text>
-    <text x="470" y="244">公众号</text>
-  </g>
-
-  <!-- Right network of IDEs (Cursor / Claude Code / Trae / 灵码 / CodeBuddy) -->
-  <g opacity="0.45" stroke="#fff" stroke-width="1.6" fill="none">
-    <line x1="1020" y1="80" x2="880" y2="160"/>
-    <line x1="880" y1="160" x2="1020" y2="240"/>
-    <line x1="880" y1="160" x2="730" y2="80"/>
-    <line x1="880" y1="160" x2="730" y2="240"/>
-  </g>
-  <g fill="#fff" opacity="0.85">
-    <circle cx="1020" cy="80" r="14"/>
-    <circle cx="1020" cy="240" r="14"/>
-    <circle cx="880" cy="160" r="18"/>
-    <circle cx="730" cy="80" r="14"/>
-    <circle cx="730" cy="240" r="14"/>
-  </g>
-  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif"
-     font-size="10" fill="#4c1d95" text-anchor="middle" font-weight="700">
-    <text x="1020" y="84">Cursor</text>
-    <text x="1020" y="244">Claude</text>
-    <text x="880" y="164">MCP</text>
-    <text x="730" y="84">Trae</text>
-    <text x="730" y="244">灵码</text>
-  </g>
-
-  <!-- Center bridge connecting two networks -->
-  <line x1="338" y1="160" x2="862" y2="160" stroke="#fff" stroke-width="2" stroke-dasharray="6 6" opacity="0.5"/>
-
-  <!-- Title and tagline -->
-  <text x="600" y="120"
+  <!-- Title — large, centered, plenty of clearance -->
+  <text x="600" y="125"
         font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif"
-        font-size="64" font-weight="800" fill="#fff" text-anchor="middle"
+        font-size="88" font-weight="800" fill="white" text-anchor="middle"
         letter-spacing="-1">MemoMate</text>
 
+  <!-- Subtle accent line under title -->
+  <line x1="540" y1="155" x2="660" y2="155" stroke="white" stroke-width="2" opacity="0.55"/>
+
+  <!-- English subtitle -->
   <text x="600" y="200"
         font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif"
-        font-size="18" font-weight="500" fill="#fff" text-anchor="middle" opacity="0.95">
-    MCP Servers for the Chinese ecosystem · Portable cross-tool memory
+        font-size="22" font-weight="500" fill="white" text-anchor="middle" opacity="0.96">
+    MCP Servers for the Chinese Ecosystem · Portable Cross-Tool Memory
   </text>
-  <text x="600" y="228"
+
+  <!-- Chinese subtitle -->
+  <text x="600" y="240"
         font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif"
-        font-size="16" font-weight="500" fill="#fff" text-anchor="middle" opacity="0.85">
+        font-size="22" font-weight="500" fill="white" text-anchor="middle" opacity="0.86">
     中文生态 MCP 服务器集合 · 跨工具便携记忆
   </text>
 </svg>

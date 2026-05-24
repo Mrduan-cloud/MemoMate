@@ -6,12 +6,7 @@
 
 **一个不断扩展的 MCP 服务器集合 + 便携、可导出的记忆库 —— 全部在一个 Python 仓库里。**
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
-[![MCP](https://img.shields.io/badge/MCP-1.2%2B-purple.svg)](https://modelcontextprotocol.io/)
-[![Stars](https://img.shields.io/github/stars/Mrduan-cloud/MemoMate?style=social)](https://github.com/Mrduan-cloud/MemoMate)
-
-**简体中文** | [English](README.en.md)
+### **简体中文** &nbsp;|&nbsp; [English](README.en.md)
 
 </div>
 
