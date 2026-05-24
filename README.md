@@ -1,63 +1,65 @@
 # MemoMate
 
-> A growing collection of MCP Servers + a portable, exportable memory store — all in one Python repo.
+> 一个不断扩展的 MCP 服务器集合 + 便携、可导出的记忆库 —— 全部在一个 Python 仓库里。
 
-MemoMate is **two things in one project**:
+**简体中文** · [English](README.en.md)
 
-1. **`servers/`** — a growing collection of small, focused **MCP Servers** for the Chinese ecosystem (arXiv, B站, 知乎, 微信公众号, ...). One folder per server. *This is the main draw.*
-2. **`core/`** — an **opinionated, portable memory MCP Server** backed by SQLite + FTS5. Single-file storage, cross-tool, queryable. Use when Claude Code's built-in memory isn't enough.
+MemoMate 是**一个项目里的两件事**：
 
-Together they demonstrate end-to-end MCP development: breadth (many tools) and depth (one stateful, exportable store).
+1. **`servers/`** —— 一组小而专注的 **MCP 服务器**，专为中文工具生态打造（arXiv、B 站、知乎、微信公众号……）。一个文件夹 = 一个服务器。*这是主角。*
+2. **`core/`** —— 一个**轻量、便携的记忆 MCP 服务器**，基于 SQLite + FTS5。单文件存储、跨工具共享、可结构化查询。当 Claude Code 内置 memory 不够用时再用。
 
----
-
-## The servers (`servers/`) — main attraction
-
-| Server | Status | What it does |
-|---|---|---|
-| [`arxiv_search`](servers/arxiv_search/) | working | Search arXiv papers via the public Atom API (zero dependencies) |
-| [`bilibili_search`](servers/bilibili_search/) | working | Search B站 videos + fetch video info (zero dependencies) |
-| [`zhihu_search`](servers/zhihu_search/) | scaffold | Search 知乎 questions & answers |
-| [`wechat_mp`](servers/wechat_mp/) | scaffold | Read public 微信公众号 articles |
-
-Each server is a self-contained folder. New servers ship as part of the daily iteration plan.
-
-For setup instructions across all IDEs (Cursor, Claude Code, Trae, CodeBuddy, 通义灵码, ...), see **[Plug into your AI IDE](#plug-into-your-ai-ide)** below.
+两者合起来展示了 MCP 端到端开发：广度（多个实用工具）+ 深度（一个有状态、可导出的存储）。
 
 ---
 
-## Why MemoMate for 中国 AI IDE users?
+## servers/ —— 主要看点
 
-International AI coding tools (Cursor, Claude Code, Cline) excel at code generation but their MCP ecosystems are heavily Western-centric — arXiv, GitHub, npm, Stack Overflow. Chinese developers regularly need things those don't cover:
-
-- 搜 **B站 / 知乎 / 微信公众号** for technical articles and tutorials
-- Look up **12306 train schedules**, **高德地图 routes**, **豆瓣 ratings**
-- Query **国内 SaaS** like Notion-国内, 飞书, 钉钉
-- Read **arxiv-CN mirror / 中国知网** instead of the slow international arXiv
-
-**MemoMate's `servers/` collection is built to fill exactly this gap.** Each server is a small, focused MCP server for one Chinese-ecosystem tool. Any MCP-compatible IDE plugs them in the same way.
-
-| 你常用的场景 | 对应 MemoMate server | 状态 |
+| 服务器 | 状态 | 功能 |
 |---|---|---|
-| 找 B 站视频教程 | `bilibili_search` | ✅ working |
-| 查 arXiv 论文 | `arxiv_search` | ✅ working |
-| 搜知乎技术回答 | `zhihu_search` | 🚧 planned (W03) |
-| 读公众号长文 | `wechat_mp` | 🚧 planned (W04) |
-| 查火车票 / 排班 | `12306` | 🚧 planned (W07) |
-| 看 GitHub 热门 | `github_trending` | 🚧 planned (W06) |
-| 查豆瓣电影 / 书评 | `douban` | 🚧 planned (W08) |
-| 查中国天气 | `weather_cn` | 🚧 planned (W06) |
-| 搜 HackerNews | `hackernews` | 🚧 planned (W06) |
-| 总结 arXiv 论文（本地 LLM） | `arxiv_summary` | 🚧 planned (W09) |
-| 查 Notion workspace | `notion_query` | 🚧 planned (W11) |
+| [`arxiv_search`](servers/arxiv_search/) | 可用 | 通过公开 Atom API 搜 arXiv 论文（零依赖） |
+| [`bilibili_search`](servers/bilibili_search/) | 可用 | 搜 B 站视频 + 获取视频详情（零依赖） |
+| [`zhihu_search`](servers/zhihu_search/) | 脚手架 | 搜知乎问题与答案 |
+| [`wechat_mp`](servers/wechat_mp/) | 脚手架 | 读取公开的微信公众号文章 |
 
-If you're using **Trae / CodeBuddy / 通义灵码 IDE / Cursor / Claude Code** and you want your AI to *"找一下 B 站讲 LangGraph 的视频"* or *"搜知乎上关于 RAG 评测的回答"* — MemoMate is built exactly for you.
+每个 server 是一个独立的目录。新 server 按每日迭代节奏陆续上线。
 
-### Plug into your AI IDE
+针对各 IDE（Cursor、Claude Code、Trae、CodeBuddy、通义灵码 IDE……）的接入方式，参见下面的 **[接入你的 AI IDE](#接入你的-ai-ide)**。
 
-The MCP JSON structure is **identical across all clients** (it's protocol-standard) — only the file location and the UI for editing it differ.
+---
 
-**Canonical config (drop this anywhere `mcpServers` is accepted)**:
+## 为什么中国 AI IDE 用户需要 MemoMate？
+
+国际 AI 编程工具（Cursor、Claude Code、Cline）擅长生成代码，但它们的 MCP 生态高度偏向西方栈 —— arXiv、GitHub、npm、Stack Overflow。中国开发者经常需要的东西，那些工具覆盖不到：
+
+- 搜 **B 站 / 知乎 / 微信公众号**上的技术文章和教程
+- 查 **12306 火车班次**、**高德地图路线**、**豆瓣评分**
+- 接入**国内 SaaS**，比如 Notion 国内、飞书、钉钉
+- 读**国内 arXiv 镜像 / 中国知网**，而不是慢吞吞的国际 arXiv
+
+**MemoMate 的 `servers/` 集合恰好填补这个空白。** 每个服务器都是一个聚焦于某个中文生态工具的小 MCP 服务器。任何 MCP 兼容的 IDE 都用同样的方式接入。
+
+| 你常用的场景 | 对应的 MemoMate server | 状态 |
+|---|---|---|
+| 找 B 站视频教程 | `bilibili_search` | ✅ 可用 |
+| 查 arXiv 论文 | `arxiv_search` | ✅ 可用 |
+| 搜知乎技术回答 | `zhihu_search` | 🚧 计划中（W03） |
+| 读公众号长文 | `wechat_mp` | 🚧 计划中（W04） |
+| 查火车票 / 排班 | `12306` | 🚧 计划中（W07） |
+| 看 GitHub 热门 | `github_trending` | 🚧 计划中（W06） |
+| 查豆瓣电影 / 书评 | `douban` | 🚧 计划中（W08） |
+| 查中国天气 | `weather_cn` | 🚧 计划中（W06） |
+| 搜 HackerNews | `hackernews` | 🚧 计划中（W06） |
+| 总结 arXiv 论文（本地 LLM） | `arxiv_summary` | 🚧 计划中（W09） |
+| 查 Notion workspace | `notion_query` | 🚧 计划中（W11） |
+
+如果你正在用 **Trae / CodeBuddy / 通义灵码 IDE / Cursor / Claude Code**，并且想让 AI 帮你 *"找一下 B 站讲 LangGraph 的视频"* 或者 *"搜知乎上关于 RAG 评测的回答"* —— MemoMate 就是为你做的。
+
+### 接入你的 AI IDE
+
+MCP 的 JSON 结构在**所有客户端中完全一致**（这是协议标准），不同的只是文件位置和编辑界面。
+
+**通用配置（任何接受 `mcpServers` 字段的地方都能塞进去）**：
 
 ```json
 {
@@ -78,135 +80,135 @@ The MCP JSON structure is **identical across all clients** (it's protocol-standa
 }
 ```
 
-#### Where to put it, per IDE
+#### 各 IDE 的配置位置
 
 | IDE | 配置位置 | 备注 |
 |---|---|---|
-| **Cursor** | `~/.cursor/mcp.json` (or `.cursor/mcp.json` per-project) | Edit the file directly, then restart Cursor |
-| **Claude Code** | `~/.claude.json` (or use `claude mcp add` CLI) | Recommended: use the CLI, see below |
-| **Trae** (字节跳动) | 设置 → AI 模型 / MCP Servers (具体菜单随版本变化) | 粘贴上方 `mcpServers` 内的条目；或参考 [Trae 官方文档](https://docs.trae.ai/) |
-| **CodeBuddy** (腾讯) | 设置 → Extensions → MCP Servers | 添加 stdio 类型，命令 + 参数照 JSON 转写到 UI |
-| **通义灵码 IDE** (阿里) | 设置 → AI 增强 → MCP 服务器 | 新增 → stdio → 同上 |
-| **Cline / Continue / Zed** (VSCode/JetBrains 系) | 各自的 settings.json `mcpServers` 字段 | 格式相同 |
+| **Cursor** | `~/.cursor/mcp.json`（或项目级 `.cursor/mcp.json`） | 直接编辑文件，然后重启 Cursor |
+| **Claude Code** | `~/.claude.json`（或用 `claude mcp add` 命令） | 推荐用 CLI，见下方 |
+| **Trae**（字节跳动） | 设置 → AI 模型 / MCP Servers（菜单随版本变化） | 把上方 `mcpServers` 的条目粘进去；或参考 [Trae 官方文档](https://docs.trae.ai/) |
+| **CodeBuddy**（腾讯） | 设置 → Extensions → MCP Servers | 添加 stdio 类型，把命令与参数照 JSON 转写到 UI |
+| **通义灵码 IDE**（阿里） | 设置 → AI 增强 → MCP 服务器 | 新增 → stdio → 同上 |
+| **Cline / Continue / Zed**（VSCode/JetBrains 系扩展） | 各自的 `settings.json` 里的 `mcpServers` 字段 | 格式相同 |
 
-**Claude Code CLI**（推荐）:
+**Claude Code CLI**（推荐）：
 
 ```bash
 claude mcp add memomate-bilibili --scope user \
   -- uv run --directory D:/project/MemoMate memomate-bilibili
 ```
 
-> 这是 MemoMate 的核心价值——**同一个 server，所有 IDE 通用**。在 Cursor 里搜的 B 站视频，记忆了的 `save_memory`，下次切到通义灵码 IDE 直接 `recall_memory` 能取出来。
+> 这就是 MemoMate 的核心价值 —— **同一个 server，所有 IDE 通用**。在 Cursor 里搜的 B 站视频，用 `save_memory` 记下来，下次切到通义灵码 IDE 直接用 `recall_memory` 就能取出来。
 
 ---
 
-## The memory store (`core/`) — opinionated alternative
+## core/ —— 可选的便携记忆服务器
 
-A long-term memory MCP Server backed by SQLite + FTS5. Storage lives in a single file at `~/.memomate/memories.db` that you can:
+一个长期记忆 MCP 服务器，存储后端是 SQLite + FTS5。数据保存在单个文件 `~/.memomate/memories.db` 里，你可以：
 
-- **Inspect** with any SQLite tool (DB Browser, DataGrip)
-- **Back up** by copying one file
-- **Sync** across devices via Syncthing / Dropbox / Git
-- **Share** across AI clients — same memory in Claude Code, Cursor, Continue, anything MCP-compatible
-- **Query** with tags or full-text search
+- 用任意 SQLite 工具**直接查看**（DB Browser、DataGrip）
+- 复制一个文件**完成备份**
+- 通过 Syncthing / Dropbox / Git **在多设备同步**
+- 在不同 AI 客户端**共享**（Claude Code / Cursor / Continue / 任何 MCP 兼容客户端 —— 都用同一份记忆）
+- 用标签或全文搜索**结构化查询**
 
-### Why a memory server when Claude Code already has one?
+### Claude Code 已经有内置 memory，为什么还要 MemoMate？
 
-[Claude Code v2.1+](https://docs.claude.com/en/docs/claude-code) ships with an excellent built-in memory feature that writes to `~/.claude/projects/<project>/memory/*.md` automatically when you say "remember that..." or "记住...". For most workflows, **that's all you need** — and the built-in is what you should use.
+[Claude Code v2.1+](https://docs.claude.com/en/docs/claude-code) 已经内置了优秀的 memory 功能 —— 你说"记住..."或"remember that..."时它会自动把内容写到 `~/.claude/projects/<project>/memory/*.md`。对大多数工作流，**这就够了** —— 内置 memory 才是你应该用的。
 
-MemoMate's memory server fills the gaps where built-in falls short:
+MemoMate 的 memory 服务器填补的是内置无法解决的场景：
 
-| Need | Built-in memory | MemoMate `core/` |
+| 需求 | 内置 memory | MemoMate `core/` |
 |---|---|---|
-| Daily "remember this preference" | ✅ Best | Overkill |
-| Project-scoped notes | ✅ Best | Less natural |
-| **Cross-tool** memory (Claude Code + Cursor + Continue + custom agents) | ❌ Claude Code only | ✅ Any MCP client |
-| **Structured query** by tags + FTS5 | ❌ Plain markdown | ✅ SQLite FTS5 + tag column |
-| **Programmatic export** / backup / inspection | ⚠️ Scattered markdown files | ✅ Single portable `.db` file |
-| **User-global** (cross-project) facts | ⚠️ Scoped to one project | ✅ Lives in `~/.memomate/` |
-| **Programmatic access** from your own scripts | ❌ Parse markdown | ✅ Standard SQL |
+| 日常"记住这个偏好" | ✅ 最佳 | 大材小用 |
+| 项目级笔记 | ✅ 最佳 | 不够自然 |
+| **跨工具**记忆（Claude Code + Cursor + Continue + 自定义 Agent） | ❌ 仅 Claude Code | ✅ 任何 MCP 客户端 |
+| **结构化查询**（标签 + FTS5） | ❌ 纯 markdown | ✅ SQLite FTS5 + tag 字段 |
+| **可编程导出 / 备份 / 检查** | ⚠️ 散落的 markdown 文件 | ✅ 单个便携 `.db` 文件 |
+| **用户级**（跨项目）事实 | ⚠️ 单项目作用域 | ✅ 存在 `~/.memomate/` |
+| 在你自己的脚本里**编程访问** | ❌ 需要解析 markdown | ✅ 标准 SQL |
 
-If you need any of the bottom four rows, install `core/`. If not, skip it and just use the servers above.
+下面四行中有任意一个对你重要，就装 `core/`。如果都不需要，跳过 `core/`，只用上面的 servers 就够了。
 
-### How to deliberately invoke MemoMate's memory
+### 如何明确触发 MemoMate 的 memory
 
-Because Claude Code's built-in memory has **system-level priority** on generic "记住 / remember" prompts, address MemoMate explicitly when you want it:
+由于 Claude Code 内置 memory 在通用的"记住 / remember"提示下有**系统级优先级**，想用 MemoMate 时要明确点名：
 
 - *"save to MemoMate: ..."*
 - *"用 MemoMate 记一下：..."*
 - *"recall from memomate: ..."*
-- *"list memomate memories"*
+- *"列出 memomate 里的记忆"*
 
-This explicit-routing pattern is a deliberate design choice — see *Notes on competing with built-in memory* below.
+这个"显式路由"是有意的设计选择 —— 详见下方 *与内置 memory 共存的设计思路*。
 
 ---
 
-## Quick start
+## 快速开始
 
-Requires Python 3.11+. The project uses [`uv`](https://docs.astral.sh/uv/) for dependency management.
+需要 Python 3.11+。本项目用 [`uv`](https://docs.astral.sh/uv/) 做依赖管理。
 
 ```bash
-# clone and install
+# clone 并 install
 git clone https://github.com/Mrduan-cloud/MemoMate.git
 cd MemoMate
 uv sync
 
-# run the memory server (optional)
+# 跑 memory server（可选）
 uv run memomate-core
 
-# run a utility server
+# 跑一个工具 server
 uv run memomate-arxiv
 ```
 
-### Register with your AI IDE
+### 在 AI IDE 里注册
 
-See **[Plug into your AI IDE](#plug-into-your-ai-ide)** above for full instructions covering Cursor, Claude Code, Trae, CodeBuddy, 通义灵码 IDE, Cline, Continue, and Zed.
+参见上方 **[接入你的 AI IDE](#接入你的-ai-ide)** 的完整说明，覆盖 Cursor、Claude Code、Trae、CodeBuddy、通义灵码 IDE、Cline、Continue、Zed。
 
 ---
 
-## Architecture
+## 架构
 
 ```
 MemoMate/
-├── core/                       # Memory MCP Server (opinionated, optional)
-│   ├── server.py               # FastMCP server, 5 tools
-│   └── store.py                # SQLite + FTS5 storage
-└── servers/                    # Utility MCP Servers (the main draw)
-    ├── arxiv_search/           # working
-    ├── bilibili_search/        # scaffold
-    ├── zhihu_search/           # scaffold
-    └── wechat_mp/              # scaffold
+├── core/                       # 记忆 MCP 服务器（可选）
+│   ├── server.py               # FastMCP 入口，5 个工具
+│   └── store.py                # SQLite + FTS5 存储（WAL 模式支持多客户端并发）
+└── servers/                    # 工具 MCP 服务器（主角）
+    ├── arxiv_search/           # 可用
+    ├── bilibili_search/        # 可用
+    ├── zhihu_search/           # 脚手架
+    └── wechat_mp/              # 脚手架
 ```
 
-### Memory tools (`core/`)
+### Memory 工具（`core/`）
 
-| Tool | Purpose |
+| 工具 | 作用 |
 |---|---|
-| `save_memory(content, tags?, source?)` | Persist a fact to SQLite |
-| `recall_memory(query, limit=5)` | FTS5 full-text search across saved memories |
-| `list_recent_memories(limit=10)` | Reverse-chronological list |
-| `forget_memory(memory_id)` | Hard delete by id |
-| `memory_stats()` | Total count + db path |
+| `save_memory(content, tags?, source?)` | 把一条事实持久化到 SQLite |
+| `recall_memory(query, limit=5)` | 在已保存的记忆里做 FTS5 全文搜索 |
+| `list_recent_memories(limit=10)` | 按反时间序列列出最近的记忆 |
+| `forget_memory(memory_id)` | 按 id 硬删除 |
+| `memory_stats()` | 返回总条数和 db 路径 |
 
-### Adding a new utility server
+### 加一个新的工具 server
 
-1. Create `servers/<name>/` with `__init__.py`, `__main__.py`, `server.py`, `README.md`.
-2. In `server.py`, expose `mcp = FastMCP("memomate-<name>")` and a `main()` entry point.
-3. Register in `pyproject.toml` under `[project.scripts]` as `memomate-<name>`.
+1. 在 `servers/<name>/` 下建 `__init__.py`、`__main__.py`、`server.py`、`README.md`。
+2. 在 `server.py` 里暴露 `mcp = FastMCP("memomate-<name>")` 和 `main()` 入口。
+3. 在 `pyproject.toml` 的 `[project.scripts]` 注册为 `memomate-<name>`。
 
-See [`servers/arxiv_search/`](servers/arxiv_search/) as the reference implementation.
+可以参考 [`servers/arxiv_search/`](servers/arxiv_search/) 的实现作为模板。
 
 ---
 
-## Notes on competing with built-in memory
+## 与内置 memory 共存的设计思路
 
-During development, I tried hard to make MemoMate's `save_memory` the default destination for "记住 X" prompts. I tightened tool docstrings, added explicit routing hints — none of it overrode Claude Code's built-in memory. The built-in lives at a higher priority than user-installed MCP tools.
+开发过程中，我尝试通过强化工具 docstring 让 MemoMate 的 `save_memory` 成为"记住 X"提示的默认目的地。试了几轮 —— 强化描述、加显式路由提示 —— 都没能盖过 Claude Code 的内置 memory。它的优先级高于用户安装的 MCP 工具。
 
-**The lesson** isn't "Claude Code built-in beats my project" — it's:
+**经验**不是"Claude Code 内置赢了我的项目"，而是：
 
-> When your MCP server overlaps with a host's first-party feature, **don't compete on the same trigger phrase**. Differentiate on capability (portability, query model, export format) and require explicit routing.
+> 当你的 MCP 服务器和宿主的官方功能重叠时，**不要在同一个触发词上竞争**。在能力维度差异化（可移植性、查询模型、导出格式），并要求显式路由。
 
-This is also why MemoMate's main pitch shifted from "your memory layer" to "your **portable** memory layer, plus a collection of practical MCP servers." The portability and the servers are where I add value the built-in can't.
+这也是为什么 MemoMate 的主要定位从"你的记忆层"切换到了"你的**便携**记忆层 + 一组实用 MCP 服务器集合"。可移植性和 servers 集合才是内置 memory 给不了的价值。
 
 ---
 
