@@ -1,8 +1,21 @@
+<div align="center">
+
+<img src="docs/banner.svg" alt="MemoMate · 中文生态 MCP 服务器集合 + 跨工具便携记忆" width="100%"/>
+
 # MemoMate
 
-> 一个不断扩展的 MCP 服务器集合 + 便携、可导出的记忆库 —— 全部在一个 Python 仓库里。
+**一个不断扩展的 MCP 服务器集合 + 便携、可导出的记忆库 —— 全部在一个 Python 仓库里。**
 
-**简体中文** · [English](README.en.md)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
+[![MCP](https://img.shields.io/badge/MCP-1.2%2B-purple.svg)](https://modelcontextprotocol.io/)
+[![Stars](https://img.shields.io/github/stars/Mrduan-cloud/MemoMate?style=social)](https://github.com/Mrduan-cloud/MemoMate)
+
+**简体中文** | [English](README.en.md)
+
+</div>
+
+---
 
 MemoMate 是**一个项目里的两件事**：
 

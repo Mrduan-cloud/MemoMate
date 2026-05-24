@@ -1,8 +1,21 @@
+<div align="center">
+
+<img src="docs/banner.svg" alt="MemoMate · MCP Servers for the Chinese ecosystem + portable cross-tool memory" width="100%"/>
+
 # MemoMate
 
-> A growing collection of MCP Servers + a portable, exportable memory store — all in one Python repo.
+**A growing collection of MCP Servers + a portable, exportable memory store — all in one Python repo.**
 
-**English** · [简体中文](README.md)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
+[![MCP](https://img.shields.io/badge/MCP-1.2%2B-purple.svg)](https://modelcontextprotocol.io/)
+[![Stars](https://img.shields.io/github/stars/Mrduan-cloud/MemoMate?style=social)](https://github.com/Mrduan-cloud/MemoMate)
+
+[简体中文](README.md) | **English**
+
+</div>
+
+---
 
 MemoMate is **two things in one project**:
 
