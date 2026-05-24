@@ -34,9 +34,34 @@ class MemoryStore:
     def __init__(self, db_path: Path | str | None = None) -> None:
         self.db_path = _resolve_db_path(db_path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        self._conn = sqlite3.connect(str(self.db_path))
+        self._conn = sqlite3.connect(str(self.db_path), timeout=5.0)
         self._conn.row_factory = sqlite3.Row
+        self._tune_for_concurrent_clients()
         self._init_schema()
+
+    def _tune_for_concurrent_clients(self) -> None:
+        """Configure SQLite for safe multi-process access.
+
+        MemoMate is portable across MCP clients (Claude Code, Cursor, Cline,
+        Continue, Zed, ...). Each client spawns its own `memomate-core`
+        subprocess, so the same SQLite file may have several writers contending.
+        These pragmas make that scenario robust:
+
+        - `journal_mode=WAL`: multiple concurrent readers + one writer without
+          blocking; the standard recommendation for multi-process SQLite.
+        - `synchronous=NORMAL`: with WAL this is safe (no corruption risk) and
+          materially faster than the default `FULL`. Worst case on power loss
+          is losing the last in-flight transaction, which is acceptable for a
+          memory store.
+        - `busy_timeout=5000`: when two writers collide, wait up to 5 s for the
+          lock to free instead of raising `SQLITE_BUSY` immediately.
+        - `foreign_keys=ON`: defensive — not currently used, but cheap to keep
+          on so we can't accidentally rely on the off-by-default behavior later.
+        """
+        self._conn.execute("PRAGMA journal_mode = WAL")
+        self._conn.execute("PRAGMA synchronous = NORMAL")
+        self._conn.execute("PRAGMA busy_timeout = 5000")
+        self._conn.execute("PRAGMA foreign_keys = ON")
 
     def _init_schema(self) -> None:
         self._conn.executescript(

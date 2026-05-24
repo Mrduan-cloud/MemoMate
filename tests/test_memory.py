@@ -63,3 +63,33 @@ def test_access_count_increments_on_search(store: MemoryStore) -> None:
     store.search("Claude")
     recent = store.list_recent(limit=1)
     assert recent[0]["access_count"] == 2
+
+
+def test_wal_mode_is_enabled(store: MemoryStore) -> None:
+    """Concurrent-client safety requires WAL — make sure pragma stuck."""
+    journal_mode = store._conn.execute("PRAGMA journal_mode").fetchone()[0]
+    assert journal_mode.lower() == "wal", (
+        f"journal_mode is {journal_mode!r}, expected 'wal'. "
+        "Multi-client concurrent access depends on this."
+    )
+
+
+def test_busy_timeout_is_configured(store: MemoryStore) -> None:
+    """When two writers collide we want to wait, not crash."""
+    timeout_ms = store._conn.execute("PRAGMA busy_timeout").fetchone()[0]
+    assert timeout_ms >= 1000, f"busy_timeout is {timeout_ms} ms, want >= 1000"
+
+
+def test_concurrent_writers_can_both_complete(tmp_path) -> None:
+    """Two MemoryStore instances on the same DB should both write without error."""
+    db = tmp_path / "shared.db"
+    store_a = MemoryStore(db_path=db)
+    store_b = MemoryStore(db_path=db)
+    id_a = store_a.save("from client A", tags=["a"])
+    id_b = store_b.save("from client B", tags=["b"])
+    assert id_a != id_b
+    # Either store can see both rows.
+    assert store_a.count() == 2
+    assert store_b.count() == 2
+    store_a.close()
+    store_b.close()
