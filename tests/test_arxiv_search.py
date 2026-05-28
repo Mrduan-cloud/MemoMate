@@ -74,7 +74,12 @@ def test_build_url_includes_all_params():
 
 def test_build_url_points_at_arxiv_api():
     url = _build_url("agent", 5, "relevance")
-    assert url.startswith("http://export.arxiv.org/api/query?")
+    assert url.startswith("https://export.arxiv.org/api/query?")
+
+
+def test_build_url_uses_https():
+    """Query + results must travel encrypted (privacy + MITM resistance)."""
+    assert _build_url("agent", 5, "relevance").startswith("https://")
 
 
 def test_build_url_passes_field_prefixes_through_verbatim():
@@ -153,6 +158,14 @@ def test_parse_empty_feed_returns_empty_list():
     assert _parse(EMPTY_ATOM) == []
 
 
+def test_parse_raises_on_malformed_xml():
+    """Garbage / non-XML input should raise ParseError (caught upstream)."""
+    import xml.etree.ElementTree as ET
+
+    with pytest.raises(ET.ParseError):
+        _parse("<html><body>429 Too Many Requests</body>")  # truncated / not a feed
+
+
 def test_parse_returns_one_dict_per_entry():
     results = _parse(SAMPLE_ATOM)
     assert len(results) == 2
@@ -208,6 +221,26 @@ def test_search_arxiv_invalid_sort_falls_back_to_relevance(patch_fetch):
 def test_search_arxiv_valid_sort_is_preserved(patch_fetch):
     search_arxiv("agent", sort_by="submittedDate")
     assert patch_fetch["sort_by"] == "submittedDate"
+
+
+def test_search_arxiv_returns_empty_on_malformed_response(monkeypatch):
+    """If arXiv returns a non-XML / truncated body, don't crash — return []."""
+    def _garbage(query: str, max_results: int, sort_by: str) -> str:
+        # Unbalanced tags → ET.fromstring raises ParseError (the catch path).
+        return "<html><body>429 Too Many Requests"
+
+    monkeypatch.setattr("servers.arxiv_search.server._fetch", _garbage, raising=True)
+    # Must not raise — caller gets an empty list instead of a ParseError.
+    assert search_arxiv("agent") == []
+
+
+def test_search_arxiv_returns_empty_on_non_atom_xml(monkeypatch):
+    """Well-formed but non-Atom XML (no <entry>) yields an empty result set."""
+    def _non_atom(query: str, max_results: int, sort_by: str) -> str:
+        return "<html><body>maintenance</body></html>"
+
+    monkeypatch.setattr("servers.arxiv_search.server._fetch", _non_atom, raising=True)
+    assert search_arxiv("agent") == []
 
 
 # =========================================================================

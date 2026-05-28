@@ -14,7 +14,7 @@ from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("memomate-arxiv-search")
 
-ARXIV_API = "http://export.arxiv.org/api/query"
+ARXIV_API = "https://export.arxiv.org/api/query"
 ATOM_NS = "{http://www.w3.org/2005/Atom}"
 _ALLOWED_SORT = {"relevance", "lastUpdatedDate", "submittedDate"}
 
@@ -27,6 +27,9 @@ def _build_url(query: str, max_results: int, sort_by: str) -> str:
     syntax (field prefixes ``ti:`` / ``au:`` / ``abs:`` / ``cat:`` and boolean
     ``AND`` / ``OR`` / ``ANDNOT``) is handled server-side by arXiv, we only
     URL-encode it safely.
+
+    Note: this function does NOT validate ``sort_by`` — the caller
+    (``search_arxiv``) is responsible for clamping it against ``_ALLOWED_SORT``.
     """
     params = {
         "search_query": query,
@@ -48,6 +51,10 @@ def _fetch(query: str, max_results: int, sort_by: str) -> str:
 
 
 def _parse(atom_xml: str) -> list[dict[str, Any]]:
+    # Source is arXiv over HTTPS (see ARXIV_API), so we trust the payload's
+    # integrity and use the stdlib parser (keeps the server zero-dependency).
+    # `search_arxiv` still guards against a malformed response by catching
+    # ParseError, in case arXiv returns an HTML error / rate-limit page.
     root = ET.fromstring(atom_xml)
     out: list[dict[str, Any]] = []
     for entry in root.findall(f"{ATOM_NS}entry"):
@@ -93,7 +100,13 @@ def search_arxiv(
     if sort_by not in _ALLOWED_SORT:
         sort_by = "relevance"
     atom_xml = _fetch(query, max_results, sort_by)
-    return _parse(atom_xml)
+    try:
+        return _parse(atom_xml)
+    except ET.ParseError:
+        # arXiv occasionally returns a non-XML body (HTML error page,
+        # rate-limit notice). Surface an empty result set instead of
+        # letting a raw ParseError bubble up to the MCP client.
+        return []
 
 
 def main() -> None:
