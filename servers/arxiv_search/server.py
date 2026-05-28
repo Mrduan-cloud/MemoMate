@@ -19,14 +19,26 @@ ATOM_NS = "{http://www.w3.org/2005/Atom}"
 _ALLOWED_SORT = {"relevance", "lastUpdatedDate", "submittedDate"}
 
 
-def _fetch(query: str, max_results: int, sort_by: str) -> str:
+def _build_url(query: str, max_results: int, sort_by: str) -> str:
+    """Build the arXiv API query URL.
+
+    Pure function (no I/O) so the query-construction logic can be unit-tested
+    offline. The user query string is passed through verbatim — arXiv's own
+    syntax (field prefixes ``ti:`` / ``au:`` / ``abs:`` / ``cat:`` and boolean
+    ``AND`` / ``OR`` / ``ANDNOT``) is handled server-side by arXiv, we only
+    URL-encode it safely.
+    """
     params = {
         "search_query": query,
         "max_results": str(max_results),
         "sortBy": sort_by,
         "sortOrder": "descending",
     }
-    url = f"{ARXIV_API}?{urllib.parse.urlencode(params)}"
+    return f"{ARXIV_API}?{urllib.parse.urlencode(params)}"
+
+
+def _fetch(query: str, max_results: int, sort_by: str) -> str:
+    url = _build_url(query, max_results, sort_by)
     req = urllib.request.Request(
         url,
         headers={"User-Agent": "MemoMate/0.1 (https://github.com/Mrduan-cloud/MemoMate)"},
