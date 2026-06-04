@@ -27,7 +27,7 @@ MemoMate 是**一个项目里的两件事**：
 |---|---|---|
 | [`arxiv_search`](servers/arxiv_search/) | 可用 | 通过公开 Atom API 搜 arXiv 论文（零依赖） |
 | [`bilibili_search`](servers/bilibili_search/) | 可用 | 搜 B 站视频 + 获取视频详情（零依赖） |
-| [`zhihu_search`](servers/zhihu_search/) | 脚手架 | 搜知乎问题与答案 |
+| [`zhihu_search`](servers/zhihu_search/) | 可用 | 搜知乎问题与答案 + 取答案正文（零依赖） |
 | [`wechat_mp`](servers/wechat_mp/) | 脚手架 | 读取公开的微信公众号文章 |
 
 每个 server 是一个独立的目录。新 server 按每日迭代节奏陆续上线。
@@ -51,7 +51,7 @@ MemoMate 是**一个项目里的两件事**：
 |---|---|---|
 | 找 B 站视频教程 | `bilibili_search` | ✅ 可用 |
 | 查 arXiv 论文 | `arxiv_search` | ✅ 可用 |
-| 搜知乎技术回答 | `zhihu_search` | 🚧 计划中（W03） |
+| 搜知乎技术回答 | `zhihu_search` | ✅ 可用 |
 | 读公众号长文 | `wechat_mp` | 🚧 计划中（W04） |
 | 查火车票 / 排班 | `12306` | 🚧 计划中（W07） |
 | 看 GitHub 热门 | `github_trending` | 🚧 计划中（W06） |
@@ -184,7 +184,7 @@ MemoMate/
 └── servers/                    # 工具 MCP 服务器（主角）
     ├── arxiv_search/           # 可用
     ├── bilibili_search/        # 可用
-    ├── zhihu_search/           # 脚手架
+    ├── zhihu_search/           # 可用
     └── wechat_mp/              # 脚手架
 ```
 
