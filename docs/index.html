@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MemoMate · 中文生态 MCP 服务器集合 + 便携记忆库</title>
+    <meta
+      name="description"
+      content="一个不断扩展的 MCP 服务器集合(arXiv / B 站 / 知乎 / 公众号)+ 便携可导出的记忆库(SQLite + FTS5),全部在一个 Python 仓库里。"
+    />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>" />
+    <style>
+      :root {
+        --bg: #0b0a12;
+        --surface: rgba(255, 255, 255, 0.03);
+        --surface-2: rgba(255, 255, 255, 0.05);
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --text: #e9e7f0;
+        --muted: #a39db8;
+        --dim: #756f87;
+        --accent: #a78bfa;
+        --accent-2: #c4b5fd;
+        --accent-soft: rgba(139, 92, 246, 0.14);
+        --accent-border: rgba(139, 92, 246, 0.34);
+        --ok: #34d399;
+        --plan: #fbbf24;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+          "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+        background-image: radial-gradient(
+          60rem 40rem at 50% -14rem,
+          rgba(139, 92, 246, 0.16),
+          transparent 70%
+        );
+        background-repeat: no-repeat;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      ::selection {
+        background: rgba(139, 92, 246, 0.32);
+      }
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 22px;
+      }
+
+      /* nav */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(12px);
+        background: rgba(11, 10, 18, 0.72);
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-in {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 22px;
+        height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-weight: 800;
+        font-size: 17px;
+        letter-spacing: 0.3px;
+      }
+      .brand .mark {
+        font-size: 19px;
+      }
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .nav-links a {
+        color: var(--muted);
+        font-size: 14px;
+        padding: 7px 12px;
+        border-radius: 8px;
+        transition: all 0.14s;
+      }
+      .nav-links a:hover {
+        color: var(--text);
+        background: var(--surface-2);
+      }
+      .nav-links a.gh {
+        color: var(--accent-2);
+        border: 1px solid var(--accent-border);
+      }
+      @media (max-width: 680px) {
+        .nav-links a:not(.gh) {
+          display: none;
+        }
+      }
+
+      /* hero */
+      header.hero {
+        padding: 64px 0 36px;
+        text-align: center;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13px;
+        color: var(--accent-2);
+        background: var(--accent-soft);
+        border: 1px solid var(--accent-border);
+        border-radius: 999px;
+        padding: 5px 14px;
+        margin-bottom: 22px;
+      }
+      .hero h1 {
+        font-size: clamp(36px, 7vw, 60px);
+        font-weight: 800;
+        letter-spacing: -1px;
+        line-height: 1.08;
+        background: linear-gradient(180deg, #ffffff, #b9a8f0);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .hero .tagline {
+        margin: 16px auto 0;
+        max-width: 680px;
+        font-size: clamp(15px, 2.4vw, 18px);
+        color: var(--muted);
+      }
+      .cta {
+        margin-top: 30px;
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        padding: 11px 22px;
+        border-radius: 11px;
+        transition: all 0.15s;
+        border: 1px solid transparent;
+      }
+      .btn.primary {
+        background: var(--accent);
+        color: #1a1235;
+      }
+      .btn.primary:hover {
+        background: var(--accent-2);
+        transform: translateY(-1px);
+      }
+      .btn.ghost {
+        border-color: var(--border-strong);
+        color: var(--text);
+      }
+      .btn.ghost:hover {
+        border-color: var(--accent-border);
+        background: var(--surface);
+      }
+      .hero-banner {
+        margin: 44px auto 0;
+        max-width: 920px;
+        border-radius: 18px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+        display: block;
+        width: 100%;
+      }
+
+      /* sections */
+      section {
+        padding: 52px 0;
+        border-top: 1px solid var(--border);
+      }
+      .eyebrow {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      h2.sec {
+        font-size: clamp(24px, 4vw, 32px);
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        margin: 8px 0 6px;
+      }
+      .sec-sub {
+        color: var(--muted);
+        font-size: 15px;
+        max-width: 720px;
+        margin-bottom: 28px;
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+      .grid.two {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .grid.three {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .grid.four {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      @media (max-width: 860px) {
+        .grid.three,
+        .grid.four {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 560px) {
+        .grid.two,
+        .grid.three,
+        .grid.four {
+          grid-template-columns: 1fr;
+        }
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 22px;
+        transition: border-color 0.16s, transform 0.16s;
+      }
+      .card:hover {
+        border-color: var(--accent-border);
+        transform: translateY(-2px);
+      }
+      .card .ico {
+        font-size: 26px;
+      }
+      .card h3 {
+        margin: 12px 0 6px;
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .card p {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .pill {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 9px;
+        border-radius: 999px;
+        margin-left: 8px;
+        vertical-align: middle;
+      }
+      .pill.ok {
+        color: var(--ok);
+        background: rgba(52, 211, 153, 0.12);
+        border: 1px solid rgba(52, 211, 153, 0.3);
+      }
+      .pill.plan {
+        color: var(--plan);
+        background: rgba(251, 191, 36, 0.12);
+        border: 1px solid rgba(251, 191, 36, 0.3);
+      }
+      code,
+      pre,
+      .mono {
+        font-family: ui-monospace, "SF Mono", "JetBrains Mono", Consolas, monospace;
+      }
+      .card .tool {
+        margin-top: 10px;
+        font-size: 12.5px;
+        color: var(--accent-2);
+        background: var(--accent-soft);
+        border-radius: 7px;
+        padding: 3px 9px;
+        display: inline-block;
+      }
+
+      /* memory tools list */
+      .tools {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .tool-row {
+        display: flex;
+        gap: 14px;
+        align-items: baseline;
+        padding: 12px 16px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+      }
+      .tool-row .sig {
+        font-size: 13.5px;
+        color: var(--accent-2);
+        flex-shrink: 0;
+        min-width: 230px;
+      }
+      .tool-row .desc {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      @media (max-width: 620px) {
+        .tool-row {
+          flex-direction: column;
+          gap: 3px;
+        }
+        .tool-row .sig {
+          min-width: 0;
+        }
+      }
+
+      /* roadmap chips */
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 18px;
+      }
+      .chip {
+        font-size: 13px;
+        color: var(--muted);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 6px 13px;
+      }
+      .chip b {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      /* code block */
+      .code {
+        position: relative;
+        background: #07060d;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+      }
+      .code-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .code-bar .fname {
+        font-size: 12.5px;
+        color: var(--dim);
+      }
+      .copy {
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        padding: 4px 10px;
+        cursor: pointer;
+        transition: all 0.14s;
+      }
+      .copy:hover {
+        color: var(--text);
+        border-color: var(--accent-border);
+      }
+      pre {
+        padding: 16px 18px;
+        overflow-x: auto;
+        font-size: 13px;
+        line-height: 1.7;
+        color: #d6d2e6;
+      }
+      .tok-key {
+        color: #c4b5fd;
+      }
+      .tok-str {
+        color: #86efac;
+      }
+      .ide-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 16px;
+      }
+      .ide {
+        font-size: 13px;
+        color: var(--muted);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 6px 12px;
+      }
+
+      /* tech */
+      .tech {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .tech .t {
+        flex: 1 1 180px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px 18px;
+      }
+      .tech .t .k {
+        font-size: 13px;
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .tech .t .v {
+        color: var(--muted);
+        font-size: 13.5px;
+        margin-top: 4px;
+      }
+
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 30px 0 44px;
+        text-align: center;
+        color: var(--dim);
+        font-size: 13.5px;
+      }
+      footer a {
+        color: var(--accent-2);
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="nav-in">
+        <a class="brand" href="#top"><span class="mark">🧠</span> MemoMate</a>
+        <div class="nav-links">
+          <a href="#servers">Servers</a>
+          <a href="#memory">Memory</a>
+          <a href="#setup">接入</a>
+          <a class="gh" href="https://github.com/Mrduan-cloud/MemoMate" target="_blank" rel="noopener">GitHub ↗</a>
+        </div>
+      </div>
+    </nav>
+
+    <a id="top"></a>
+    <header class="hero">
+      <div class="wrap">
+        <span class="badge">◆ 为中文 AI IDE 生态而生的 MCP 工具集</span>
+        <h1>一个仓库,一套 MCP<br />服务器集合 + 便携记忆</h1>
+        <p class="tagline">
+          小而专注的 MCP 服务器(arXiv · B 站 · 知乎 · 公众号),配一个 SQLite + FTS5 的便携、可导出、跨工具共享的记忆库。
+          任何 MCP 兼容的 AI IDE 都用同样的方式接入。
+        </p>
+        <div class="cta">
+          <a class="btn primary" href="#setup">⚡ 快速接入</a>
+          <a class="btn ghost" href="https://github.com/Mrduan-cloud/MemoMate" target="_blank" rel="noopener">在 GitHub 查看源码</a>
+        </div>
+        <img class="hero-banner" src="banner.svg" alt="MemoMate" />
+      </div>
+    </header>
+
+    <!-- 两件事 -->
+    <section id="what">
+      <div class="wrap">
+        <div class="eyebrow">一个项目里的两件事</div>
+        <h2 class="sec">广度 × 深度</h2>
+        <p class="sec-sub">端到端的 MCP 开发:既有一组实用工具的广度,也有一个有状态、可导出存储的深度。</p>
+        <div class="grid two">
+          <div class="card">
+            <div class="ico">🔌</div>
+            <h3>servers/ —— 主角</h3>
+            <p>
+              一组聚焦中文工具生态的 MCP 服务器。一个文件夹 = 一个服务器,arXiv / B 站搜索已可用,且零第三方依赖。
+            </p>
+          </div>
+          <div class="card">
+            <div class="ico">🧠</div>
+            <h3>core/ —— 便携记忆</h3>
+            <p>
+              基于 SQLite + FTS5 的长期记忆服务器。单文件存储、跨工具共享、可用标签 + 全文检索结构化查询,一个 <code>.db</code> 即可备份。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 痛点 -->
+    <section id="why">
+      <div class="wrap">
+        <div class="eyebrow">为什么</div>
+        <h2 class="sec">填补国际 MCP 生态的中文空白</h2>
+        <p class="sec-sub">
+          Cursor / Claude Code / Cline 的 MCP 生态高度偏向西方栈 —— arXiv、GitHub、npm、Stack Overflow。
+          中国开发者常用的 B 站、知乎、公众号、12306、豆瓣……它们覆盖不到。MemoMate 的 servers 集合恰好补上这块。
+        </p>
+      </div>
+    </section>
+
+    <!-- servers -->
+    <section id="servers">
+      <div class="wrap">
+        <div class="eyebrow">Servers · 主要看点</div>
+        <h2 class="sec">MCP 工具服务器</h2>
+        <p class="sec-sub">每个 server 是一个独立目录,暴露 <code>FastMCP</code> 实例与 <code>main()</code> 入口,任何 MCP 客户端通用接入。</p>
+        <div class="grid two">
+          <div class="card">
+            <div class="ico">📄</div>
+            <h3>arxiv_search <span class="pill ok">可用</span></h3>
+            <p>通过公开 Atom API 搜索 arXiv 论文,零依赖、含畸形 XML 容错。</p>
+            <span class="tool mono">search_arxiv(query, max_results)</span>
+          </div>
+          <div class="card">
+            <div class="ico">📺</div>
+            <h3>bilibili_search <span class="pill ok">可用</span></h3>
+            <p>搜索 B 站视频 + 获取视频详情,零依赖。</p>
+            <span class="tool mono">search_bilibili_videos(keyword)</span>
+            <span class="tool mono">get_video_info(bvid)</span>
+          </div>
+          <div class="card">
+            <div class="ico">💬</div>
+            <h3>zhihu_search <span class="pill plan">脚手架</span></h3>
+            <p>搜索知乎问题与答案。已搭好目录骨架,按每日迭代节奏上线。</p>
+          </div>
+          <div class="card">
+            <div class="ico">📰</div>
+            <h3>wechat_mp <span class="pill plan">脚手架</span></h3>
+            <p>读取公开的微信公众号文章。脚手架就绪,功能开发中。</p>
+          </div>
+        </div>
+        <div class="chips">
+          <span class="chip">🗺️ 路线图:</span>
+          <span class="chip"><b>github_trending</b></span>
+          <span class="chip"><b>hackernews</b></span>
+          <span class="chip"><b>weather_cn</b></span>
+          <span class="chip"><b>12306</b> 车次</span>
+          <span class="chip"><b>douban</b> 影评/书评</span>
+          <span class="chip"><b>arxiv_summary</b> 本地 LLM</span>
+          <span class="chip"><b>notion_query</b></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- memory -->
+    <section id="memory">
+      <div class="wrap">
+        <div class="eyebrow">core/ · 便携记忆</div>
+        <h2 class="sec">5 个记忆工具,一个可移植 .db</h2>
+        <p class="sec-sub">
+          数据保存在单个文件 <code>~/.memomate/memories.db</code>(WAL 模式支持多客户端并发)。可用任意 SQLite 工具直接查看、复制一份即备份、跨 AI 客户端共享同一份记忆。
+        </p>
+        <div class="tools">
+          <div class="tool-row">
+            <span class="sig mono">save_memory(content, tags?, source?)</span>
+            <span class="desc">把一条事实持久化到 SQLite</span>
+          </div>
+          <div class="tool-row">
+            <span class="sig mono">recall_memory(query, limit=5)</span>
+            <span class="desc">在已保存记忆里做 FTS5 全文搜索</span>
+          </div>
+          <div class="tool-row">
+            <span class="sig mono">list_recent_memories(limit=10)</span>
+            <span class="desc">按反时间序列出最近记忆</span>
+          </div>
+          <div class="tool-row">
+            <span class="sig mono">forget_memory(memory_id)</span>
+            <span class="desc">按 id 硬删除</span>
+          </div>
+          <div class="tool-row">
+            <span class="sig mono">memory_stats()</span>
+            <span class="desc">返回总条数与 db 路径</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- setup -->
+    <section id="setup">
+      <div class="wrap">
+        <div class="eyebrow">接入</div>
+        <h2 class="sec">三步接入任意 AI IDE</h2>
+        <p class="sec-sub">
+          MCP 的 JSON 结构在所有客户端完全一致(协议标准),不同的只是文件位置。把下面的条目塞进任何接受 <code>mcpServers</code> 的地方即可。
+        </p>
+        <div class="code">
+          <div class="code-bar">
+            <span class="fname mono">~/.cursor/mcp.json · ~/.claude.json · …</span>
+            <button class="copy" onclick="copyCfg(this)">复制</button>
+          </div>
+          <pre id="cfg"><code>{
+  <span class="tok-key">"mcpServers"</span>: {
+    <span class="tok-key">"memomate-bilibili"</span>: {
+      <span class="tok-key">"command"</span>: <span class="tok-str">"uv"</span>,
+      <span class="tok-key">"args"</span>: [<span class="tok-str">"run"</span>, <span class="tok-str">"--directory"</span>, <span class="tok-str">"D:/project/MemoMate"</span>, <span class="tok-str">"memomate-bilibili"</span>]
+    },
+    <span class="tok-key">"memomate-arxiv"</span>: {
+      <span class="tok-key">"command"</span>: <span class="tok-str">"uv"</span>,
+      <span class="tok-key">"args"</span>: [<span class="tok-str">"run"</span>, <span class="tok-str">"--directory"</span>, <span class="tok-str">"D:/project/MemoMate"</span>, <span class="tok-str">"memomate-arxiv"</span>]
+    },
+    <span class="tok-key">"memomate"</span>: {
+      <span class="tok-key">"command"</span>: <span class="tok-str">"uv"</span>,
+      <span class="tok-key">"args"</span>: [<span class="tok-str">"run"</span>, <span class="tok-str">"--directory"</span>, <span class="tok-str">"D:/project/MemoMate"</span>, <span class="tok-str">"memomate-core"</span>]
+    }
+  }
+}</code></pre>
+        </div>
+        <p class="sec-sub" style="margin-top: 18px">Claude Code CLI(推荐):</p>
+        <div class="code">
+          <div class="code-bar">
+            <span class="fname mono">terminal</span>
+            <button class="copy" onclick="copyCli(this)">复制</button>
+          </div>
+          <pre id="cli"><code>claude mcp add memomate-bilibili --scope user \
+  -- uv run --directory D:/project/MemoMate memomate-bilibili</code></pre>
+        </div>
+        <div class="ide-list">
+          <span class="ide">Cursor</span>
+          <span class="ide">Claude Code</span>
+          <span class="ide">Trae</span>
+          <span class="ide">CodeBuddy</span>
+          <span class="ide">通义灵码 IDE</span>
+          <span class="ide">Cline</span>
+          <span class="ide">Continue</span>
+          <span class="ide">Zed</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- tech -->
+    <section id="tech">
+      <div class="wrap">
+        <div class="eyebrow">技术栈</div>
+        <h2 class="sec">极简、可移植、零负担</h2>
+        <div class="tech">
+          <div class="t"><div class="k">FastMCP</div><div class="v">每个 server 一个 FastMCP 实例 + main() 入口</div></div>
+          <div class="t"><div class="k">SQLite + FTS5</div><div class="v">单文件记忆库,WAL 并发,全文检索 + 标签</div></div>
+          <div class="t"><div class="k">Python 3.11+ · uv</div><div class="v">uv 管依赖,uv run 即起,搜索 server 零第三方依赖</div></div>
+          <div class="t"><div class="k">pytest · ruff</div><div class="v">解析层纯函数化 + 畸形输入容错回归测试</div></div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <p>
+          MemoMate · MIT License ·
+          <a href="https://github.com/Mrduan-cloud/MemoMate" target="_blank" rel="noopener">github.com/Mrduan-cloud/MemoMate</a>
+        </p>
+        <p style="margin-top: 6px; color: var(--dim)">同一个 server,所有 IDE 通用 —— 在 Cursor 里记下的,切到通义灵码也能取出。</p>
+      </div>
+    </footer>
+
+    <script>
+      function flash(btn) {
+        const old = btn.textContent;
+        btn.textContent = "已复制 ✓";
+        setTimeout(() => (btn.textContent = old), 1400);
+      }
+      function copyText(id, btn) {
+        const el = document.getElementById(id);
+        navigator.clipboard.writeText(el.innerText).then(() => flash(btn));
+      }
+      function copyCfg(btn) {
+        copyText("cfg", btn);
+      }
+      function copyCli(btn) {
+        copyText("cli", btn);
+      }
+    </script>
+  </body>
+</html>

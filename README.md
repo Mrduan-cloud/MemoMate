@@ -19,6 +19,8 @@ MemoMate 是**一个项目里的两件事**：
 
 两者合起来展示了 MCP 端到端开发：广度（多个实用工具）+ 深度（一个有状态、可导出的存储）。
 
+> 🌐 **项目主页（单文件静态落地页）**：[`docs/index.html`](docs/index.html) —— 本地双击即可打开；或在仓库 **Settings → Pages → Source: `main` / `/docs`** 一键发布为公网站点。
+
 ---
 
 ## servers/ —— 主要看点
