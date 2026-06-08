@@ -6,9 +6,10 @@ anti-scraping, so this server:
 1. sends a realistic browser User-Agent and warms a cookie jar off the homepage
    (the ``search_v3`` endpoint expects a few cookies set on first visit);
 2. **self-rate-limits** to >= 2s between calls (``_RateLimiter``) — 知乎 throttles
-   hard, so we throttle ourselves first (this is the "rate-limit 占位" the
-   scaffold called for; can later grow into a token bucket / persistent window);
-3. degrades gracefully — any network / parse error returns ``[]`` (or an error
+   hard, so we throttle ourselves first;
+3. **caches search results for 24h** (SQLite at ``~/.memomate/zhihu_cache.db``) so
+   repeated queries never re-hit 知乎;
+4. degrades gracefully — any network / parse error returns ``[]`` (or an error
    dict for ``fetch_answer``) rather than raising to the MCP client.
 """
 
@@ -26,6 +27,8 @@ from http.cookiejar import CookieJar
 from typing import Any
 
 from mcp.server.fastmcp import FastMCP
+
+from servers.zhihu_search.cache import ResultCache, cache_key
 
 mcp = FastMCP("memomate-zhihu-search")
 
@@ -66,6 +69,7 @@ class _RateLimiter:
 
 
 _limiter = _RateLimiter(2.0)
+_cache = ResultCache()
 
 
 def _new_opener() -> urllib.request.OpenerDirector:
@@ -173,13 +177,18 @@ def search_zhihu(query: str, kind: str = "question", limit: int = 5) -> list[dic
 
     Returns:
         List of normalized results. Returns an **empty list** if 知乎 blocks the
-        request (anti-bot / rate-limit) — the scaffold favors graceful
-        degradation over raising to the MCP client.
+        request (anti-bot / rate-limit) — favors graceful degradation over
+        raising to the MCP client. Fresh non-empty results are cached 24h.
     """
     kind = _normalize_kind(kind)
     limit = max(1, min(int(limit), 20))
-    url = _build_search_url(query, limit)
 
+    key = cache_key(query, kind, limit)
+    cached = _cache.get(key)
+    if cached is not None:
+        return cached
+
+    url = _build_search_url(query, limit)
     _limiter.acquire()
     opener = _new_opener()
     try:
@@ -187,7 +196,11 @@ def search_zhihu(query: str, kind: str = "question", limit: int = 5) -> list[dic
             payload = json.loads(resp.read().decode("utf-8"))
     except (urllib.error.URLError, json.JSONDecodeError, OSError):
         return []
-    return _parse_search(payload, kind, limit)
+    results = _parse_search(payload, kind, limit)
+    # 只缓存非空结果:被反爬挡掉时返回 [] 不写缓存,以便尽快重试
+    if results:
+        _cache.put(key, results)
+    return results
 
 
 @mcp.tool()
