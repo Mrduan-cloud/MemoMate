@@ -7,14 +7,19 @@ by default; run with `pytest -m network` to hit the real 知乎 API.
 
 from __future__ import annotations
 
+import json
+import urllib.error
+
 import pytest
 
+from servers.zhihu_search import server as zserver
 from servers.zhihu_search.server import (
     _build_search_url,
     _normalize_kind,
     _parse_search,
     _RateLimiter,
     _strip_html,
+    search_zhihu,
 )
 
 # A trimmed-but-realistic search_v3 payload: one question, one answer, and two
@@ -152,6 +157,119 @@ def test_rate_limiter_no_wait_after_interval() -> None:
     rl._last = 100.0
     assert rl.wait_seconds(102.0) == 0.0
     assert rl.wait_seconds(105.0) == 0.0
+
+
+# ---------- search_zhihu end-to-end with mocked HTTP (offline) ----------
+class _FakeResp:
+    """Minimal context-manager HTTP response wrapping fixed JSON bytes."""
+
+    def __init__(self, payload: bytes) -> None:
+        self._payload = payload
+
+    def __enter__(self) -> _FakeResp:
+        return self
+
+    def __exit__(self, *exc: object) -> bool:
+        return False
+
+    def read(self) -> bytes:
+        return self._payload
+
+
+class _FakeOpener:
+    """Stand-in for the urllib opener: records calls, returns canned bytes.
+
+    If ``error`` is set, ``open`` raises it to exercise graceful degradation.
+    """
+
+    def __init__(self, payload: dict, calls: list, error: Exception | None = None) -> None:
+        self._bytes = json.dumps(payload).encode("utf-8")
+        self._calls = calls
+        self._error = error
+
+    def open(self, req: object, timeout: float | None = None) -> _FakeResp:
+        self._calls.append(getattr(req, "full_url", req))
+        if self._error is not None:
+            raise self._error
+        return _FakeResp(self._bytes)
+
+
+class _DictCache:
+    """In-memory cache stub so tests never touch the real ~/.memomate SQLite db."""
+
+    def __init__(self) -> None:
+        self.store: dict = {}
+
+    def get(self, key: str):
+        return self.store.get(key)
+
+    def put(self, key: str, value) -> None:
+        self.store[key] = value
+
+
+@pytest.fixture
+def offline(monkeypatch: pytest.MonkeyPatch):
+    """Neutralize the network + sleep + real cache; yield a calls recorder.
+
+    Returns a helper that installs a fake opener (optionally erroring) and the
+    shared ``calls`` list so a test can assert how many HTTP hits happened.
+    """
+    calls: list = []
+    cache = _DictCache()
+    monkeypatch.setattr(zserver, "_cache", cache)
+    monkeypatch.setattr(zserver._limiter, "acquire", lambda: None)  # no real 2s sleep
+
+    def install(payload: dict, error: Exception | None = None) -> None:
+        monkeypatch.setattr(
+            zserver, "_new_opener", lambda *a, **k: _FakeOpener(payload, calls, error)
+        )
+
+    install.calls = calls  # type: ignore[attr-defined]
+    install.cache = cache  # type: ignore[attr-defined]
+    return install
+
+
+def test_search_zhihu_hit_path_parses_and_caches(offline) -> None:
+    offline(SAMPLE)
+    results = search_zhihu("LangGraph", kind="question", limit=5)
+
+    assert len(results) == 1
+    assert results[0]["id"] == 12345
+    assert results[0]["title"] == "如何评价 LangGraph？"  # <em> stripped end-to-end
+    # one network hit, and the non-empty result was cached
+    assert len(offline.calls) == 1
+    assert offline.cache.store  # cache populated
+
+
+def test_search_zhihu_second_call_served_from_cache(offline) -> None:
+    offline(SAMPLE)
+    first = search_zhihu("LangGraph", kind="question", limit=5)
+    second = search_zhihu("LangGraph", kind="question", limit=5)
+
+    assert first == second
+    # second call must NOT hit the network again
+    assert len(offline.calls) == 1
+
+
+def test_search_zhihu_network_error_degrades_to_empty(offline) -> None:
+    offline(SAMPLE, error=urllib.error.URLError("boom"))
+    results = search_zhihu("LangGraph", kind="question", limit=5)
+
+    assert results == []
+    # failure is not cached (so a later call can retry)
+    assert offline.cache.store == {}
+
+
+def test_search_zhihu_empty_results_not_cached(offline) -> None:
+    # payload with no question objects → parsed result is empty
+    offline({"data": [{"object": {"type": "answer", "id": 1}}]})
+    results = search_zhihu("nothing", kind="question", limit=5)
+
+    assert results == []
+    assert offline.cache.store == {}  # empty not cached
+    # a retry therefore hits the network again
+    search_zhihu("nothing", kind="question", limit=5)
+    assert len(offline.calls) == 2
 
 
 # ---------- live (network) ----------
