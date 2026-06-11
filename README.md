@@ -28,8 +28,9 @@ MemoMate 是**一个项目里的两件事**：
 | 服务器 | 状态 | 功能 |
 |---|---|---|
 | [`arxiv_search`](servers/arxiv_search/) | 可用 | 通过公开 Atom API 搜 arXiv 论文（零依赖） |
-| [`bilibili_search`](servers/bilibili_search/) | 可用 | 搜 B 站视频 + 获取视频详情（零依赖） |
+| [`bilibili_search`](servers/bilibili_search/) | 可用 | 搜 B 站视频 + 视频详情 + 取字幕转写（零依赖） |
 | [`zhihu_search`](servers/zhihu_search/) | 可用 | 搜知乎问题与答案 + 取答案正文（零依赖） |
+| [`weather_cn`](servers/weather_cn/) | 可用 | 中文城市天气 + 3 天预报，wttr.in 免 key（零依赖） |
 | [`wechat_mp`](servers/wechat_mp/) | 脚手架 | 读取公开的微信公众号文章 |
 
 每个 server 是一个独立的目录。新 server 按每日迭代节奏陆续上线。
@@ -54,7 +55,8 @@ MemoMate 是**一个项目里的两件事**：
 | 找 B 站视频教程 | `bilibili_search` | ✅ 可用 |
 | 查 arXiv 论文 | `arxiv_search` | ✅ 可用 |
 | 搜知乎技术回答 | `zhihu_search` | ✅ 可用 |
-| 读公众号长文 | `wechat_mp` | 🚧 计划中（W04） |
+| 查城市天气 / 出行参考 | `weather_cn` | ✅ 可用 |
+| 读公众号长文 | `wechat_mp` | 🚧 计划中 |
 | 查火车票 / 排班 | `12306` | 🚧 计划中（W07） |
 | 看 GitHub 热门 | `github_trending` | 🚧 计划中（W06） |
 | 查豆瓣电影 / 书评 | `douban` | 🚧 计划中（W08） |
@@ -187,6 +189,7 @@ MemoMate/
     ├── arxiv_search/           # 可用
     ├── bilibili_search/        # 可用
     ├── zhihu_search/           # 可用
+    ├── weather_cn/             # 可用
     └── wechat_mp/              # 脚手架
 ```
 
