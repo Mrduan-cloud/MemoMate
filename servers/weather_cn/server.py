@@ -32,6 +32,27 @@ _UA = "memomate-weather-cn/0.1 (+https://github.com/Mrduan-cloud/MemoMate)"
 # the most representative slot for a day's headline description.
 _NOON_SLOT = 4
 
+# WWO 标准天气码 → 中文。实测 wttr.in 的 lang_zh 字段经常装的是英文
+# (lang=zh 参数 / Accept-Language 头 / zh 子域三种姿势都一样),
+# 所以中文描述以本地码表为准,lang_zh 只作未知码的回退。
+_WEATHER_CODE_ZH: dict[str, str] = {
+    "113": "晴", "116": "局部多云", "119": "多云", "122": "阴",
+    "143": "薄雾", "248": "雾", "260": "冻雾",
+    "176": "局部阵雨", "263": "局部毛毛雨", "266": "毛毛雨",
+    "281": "冻毛毛雨", "284": "强冻毛毛雨",
+    "293": "局部小雨", "296": "小雨", "299": "局部中雨", "302": "中雨",
+    "305": "局部大雨", "308": "大雨", "311": "冻雨", "314": "强冻雨",
+    "353": "小阵雨", "356": "中到大阵雨", "359": "强阵雨",
+    "179": "局部阵雪", "227": "风吹雪", "230": "暴风雪",
+    "323": "局部小雪", "326": "小雪", "329": "局部中雪", "332": "中雪",
+    "335": "局部大雪", "338": "大雪", "368": "小阵雪", "371": "中到大阵雪",
+    "182": "局部雨夹雪", "185": "局部冻毛毛雨", "317": "小雨夹雪",
+    "320": "中雨夹雪", "362": "小阵雨夹雪", "365": "中阵雨夹雪",
+    "350": "冰粒", "374": "小冰粒阵", "377": "中冰粒阵",
+    "200": "局部雷阵雨", "386": "雷阵雨", "389": "强雷阵雨",
+    "392": "雷阵雪", "395": "大暴雪",
+}
+
 
 class _RateLimiter:
     """Minimal min-interval limiter (same shape as the 知乎 / B站 servers').
@@ -70,11 +91,15 @@ def _build_url(city: str) -> str:
 
 
 def _zh_desc(obj: dict[str, Any]) -> str:
-    """Condition text: prefer the ``lang_zh`` translation, fall back to English.
+    """Condition text: local WWO code map first, then lang_zh, then English.
 
-    Both fields are wttr.in's ``[{"value": "..."}]`` shape; either may be
-    missing or empty, so every access is guarded.
+    上游 lang_zh 不可靠(常为英文),本地码表才是中文描述的权威来源;
+    未知码再走 ``lang_zh → weatherDesc`` 回退链。所有字段访问都有防护
+    (列表元素可能不是 dict)。
     """
+    code = str(obj.get("weatherCode") or "").strip()
+    if code in _WEATHER_CODE_ZH:
+        return _WEATHER_CODE_ZH[code]
     for key in ("lang_zh", "weatherDesc"):
         arr = obj.get(key) or []
         # wttr.in 偶有形状漂移:列表元素可能不是 dict —— 跳过而不是抛 AttributeError
