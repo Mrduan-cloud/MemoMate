@@ -60,8 +60,12 @@ _limiter = _RateLimiter(1.0)
 
 # ============ pure helpers (offline unit-testable) ============
 def _build_url(city: str) -> str:
-    """wttr.in JSON URL for a city. Chinese names are percent-encoded."""
-    q = urllib.parse.quote((city or "").strip())
+    """wttr.in JSON URL for a city. Chinese names are percent-encoded.
+
+    ``safe=""`` also encodes ``/`` so a city string can't address other
+    wttr.in paths (e.g. ``:help``) — harmless but sloppier.
+    """
+    q = urllib.parse.quote((city or "").strip(), safe="")
     return f"{_BASE}/{q}?format=j1&lang=zh"
 
 
@@ -73,8 +77,9 @@ def _zh_desc(obj: dict[str, Any]) -> str:
     """
     for key in ("lang_zh", "weatherDesc"):
         arr = obj.get(key) or []
-        if arr and isinstance(arr, list):
-            val = (arr[0] or {}).get("value", "")
+        # wttr.in 偶有形状漂移:列表元素可能不是 dict —— 跳过而不是抛 AttributeError
+        if arr and isinstance(arr, list) and isinstance(arr[0], dict):
+            val = arr[0].get("value", "")
             if isinstance(val, str) and val.strip():
                 return val.strip()
     return ""
@@ -136,7 +141,12 @@ def _fetch_j1(city: str) -> dict[str, Any]:
         return json.loads(resp.read().decode("utf-8"))
 
 
-_NET_ERRORS = (urllib.error.URLError, json.JSONDecodeError, OSError, ValueError)
+# 网络错误 + payload 形状漂移(非 dict 元素 / 缺键 / 类型不符)都走优雅降级 ——
+# docstring 承诺 "returns error dict instead of raising",这里是兜底防线
+_NET_ERRORS = (
+    urllib.error.URLError, json.JSONDecodeError, OSError,
+    ValueError, TypeError, AttributeError, KeyError, IndexError,
+)
 
 
 # ============ tools ============
@@ -186,7 +196,10 @@ def get_forecast(city: str, days: int = 3) -> dict[str, Any]:
     city = (city or "").strip()
     if not city:
         return {"error": "请提供城市名,例如 北京 / Shanghai"}
-    days = max(1, min(int(days), 3))
+    try:
+        days = max(1, min(int(days), 3))
+    except (TypeError, ValueError):
+        days = 3  # 非数字输入回退到 wttr.in 上限
     try:
         payload = _fetch_j1(city)
         forecast = _parse_forecast(payload, days)

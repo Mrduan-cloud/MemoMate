@@ -80,6 +80,13 @@ def test_build_url_strips_whitespace() -> None:
     assert _build_url(" Shanghai ") == _build_url("Shanghai")
 
 
+def test_build_url_encodes_slash() -> None:
+    # safe="":城市串里的 / 也编码,防止寻址到 wttr.in 其它路径(如 :help)
+    url = _build_url("台北/:help")
+    assert "/:help" not in url
+    assert "%2F" in url
+
+
 # ---------- _zh_desc ----------
 def test_zh_desc_prefers_lang_zh() -> None:
     obj = {"lang_zh": [{"value": "晴"}], "weatherDesc": [{"value": "Sunny"}]}
@@ -95,6 +102,12 @@ def test_zh_desc_falls_back_to_english() -> None:
 def test_zh_desc_handles_missing() -> None:
     assert _zh_desc({}) == ""
     assert _zh_desc({"lang_zh": [], "weatherDesc": None}) == ""
+
+
+def test_zh_desc_skips_non_dict_elements() -> None:
+    # 形状漂移:列表元素是字符串而非 {"value": ...} —— 跳过、回退、不抛栈
+    assert _zh_desc({"lang_zh": ["晴"], "weatherDesc": [{"value": "Sunny"}]}) == "Sunny"
+    assert _zh_desc({"lang_zh": ["晴"], "weatherDesc": ["Sunny"]}) == ""
 
 
 # ---------- _parse_current ----------
@@ -177,6 +190,22 @@ def test_tools_degrade_gracefully_on_network_error(monkeypatch: pytest.MonkeyPat
 def test_tools_reject_blank_city() -> None:
     assert "error" in get_weather("  ")
     assert "error" in get_forecast("")
+
+
+def test_tools_survive_malformed_payload(monkeypatch: pytest.MonkeyPatch) -> None:
+    """合法 JSON 但形状漂移(列表元素不是 dict)→ 降级为 error dict,绝不抛栈。"""
+    malformed = {"current_condition": ["not-a-dict"], "weather": ["not-a-dict"]}
+    monkeypatch.setattr(wserver, "_fetch_j1", lambda city: malformed)
+    out = get_weather("北京")
+    assert isinstance(out, dict) and "error" in out
+    out = get_forecast("北京")
+    assert isinstance(out, dict) and "error" in out
+
+
+def test_get_forecast_non_numeric_days(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(wserver, "_fetch_j1", lambda city: SAMPLE)
+    out = get_forecast("北京", days="abc")  # type: ignore[arg-type]
+    assert "error" not in out and out["days"] == 3  # 回退到上限 3 天
 
 
 # ---------- live (network) ----------
