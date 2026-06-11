@@ -104,6 +104,19 @@ def test_zh_desc_handles_missing() -> None:
     assert _zh_desc({"lang_zh": [], "weatherDesc": None}) == ""
 
 
+def test_zh_desc_code_map_beats_unreliable_lang_zh() -> None:
+    # 实测回归:wttr.in 的 lang_zh 常装英文("Sunny"),本地 WWO 码表必须优先
+    obj = {"weatherCode": "113", "lang_zh": [{"value": "Sunny"}],
+           "weatherDesc": [{"value": "Sunny"}]}
+    assert _zh_desc(obj) == "晴"
+    assert _zh_desc({"weatherCode": "389"}) == "强雷阵雨"
+
+
+def test_zh_desc_unknown_code_falls_back() -> None:
+    obj = {"weatherCode": "999", "weatherDesc": [{"value": "Odd"}]}
+    assert _zh_desc(obj) == "Odd"
+
+
 def test_zh_desc_skips_non_dict_elements() -> None:
     # 形状漂移:列表元素是字符串而非 {"value": ...} —— 跳过、回退、不抛栈
     assert _zh_desc({"lang_zh": ["晴"], "weatherDesc": [{"value": "Sunny"}]}) == "Sunny"
