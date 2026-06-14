@@ -25,6 +25,7 @@ memomate-bilibili = "servers.bilibili_search.server:main"
 memomate-zhihu = "servers.zhihu_search.server:main"
 memomate-weather = "servers.weather_cn.server:main"
 memomate-github-trending = "servers.github_trending.server:main"
+memomate-hackernews = "servers.hackernews.server:main"
 
 [build-system]
 requires = ["hatchling"]

@@ -21,6 +21,7 @@ Each server should:
 | [`zhihu_search`](zhihu_search/) | working | Search 知乎 questions/answers + fetch answer body (rate-limited, 24h cache) |
 | [`weather_cn`](weather_cn/) | working | Chinese-city weather + 3-day forecast via wttr.in (stdlib only, no key) |
 | [`github_trending`](github_trending/) | working | GitHub Trending repos, daily/weekly/monthly + language filter (stdlib only) |
+| [`hackernews`](hackernews/) | working | Hacker News 榜单 (top/new/best/ask/show/job) + 全文检索 (official API + Algolia, stdlib only) |
 | [`wechat_mp`](wechat_mp/) | scaffold | Fetch public 微信公众号 article content |
 
 ## Why one-folder-per-server?
