@@ -35,7 +35,7 @@ MemoMate 是**一个项目里的两件事**：
 | [`hackernews`](servers/hackernews/) | 可用 | Hacker News 榜单（top/new/best/ask/show/job）+ 全文检索（官方 API + Algolia，零依赖） |
 | [`wechat_mp`](servers/wechat_mp/) | 脚手架 | 读取公开的微信公众号文章 |
 
-每个 server 是一个独立的目录。新 server 按每日迭代节奏陆续上线。
+每个 server 是一个独立的目录。新 server 按每日迭代节奏陆续上线。**一页速查（每个 server 一句话 + 3 个示例 prompt）见 [`SERVERS.md`](SERVERS.md)。**
 
 针对各 IDE（Cursor、Claude Code、Trae、CodeBuddy、通义灵码 IDE……）的接入方式，参见下面的 **[接入你的 AI IDE](#接入你的-ai-ide)**。
 
