@@ -12,6 +12,8 @@ Each server should:
 4. Have its own `README.md` describing tools, examples, env vars.
 5. Be registered in `pyproject.toml` under `[project.scripts]` as `memomate-<name>`.
 
+> 想知道**每个 server 能问什么**(一句话 + 3 个示例 prompt)?见一页速查 [`../SERVERS.md`](../SERVERS.md)。
+
 ## Available servers
 
 | Folder | Status | Description |
