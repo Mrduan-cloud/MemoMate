@@ -31,6 +31,7 @@ MemoMate 是**一个项目里的两件事**：
 | [`bilibili_search`](servers/bilibili_search/) | 可用 | 搜 B 站视频 + 视频详情 + 取字幕转写（零依赖） |
 | [`zhihu_search`](servers/zhihu_search/) | 可用 | 搜知乎问题与答案 + 取答案正文（零依赖） |
 | [`weather_cn`](servers/weather_cn/) | 可用 | 中文城市天气 + 3 天预报，wttr.in 免 key（零依赖） |
+| [`github_trending`](servers/github_trending/) | 可用 | GitHub 热门仓库 daily/weekly/monthly + 语言过滤（零依赖） |
 | [`wechat_mp`](servers/wechat_mp/) | 脚手架 | 读取公开的微信公众号文章 |
 
 每个 server 是一个独立的目录。新 server 按每日迭代节奏陆续上线。
@@ -58,9 +59,8 @@ MemoMate 是**一个项目里的两件事**：
 | 查城市天气 / 出行参考 | `weather_cn` | ✅ 可用 |
 | 读公众号长文 | `wechat_mp` | 🚧 计划中 |
 | 查火车票 / 排班 | `12306` | 🚧 计划中（W07） |
-| 看 GitHub 热门 | `github_trending` | 🚧 计划中（W06） |
+| 看 GitHub 热门 | `github_trending` | ✅ 可用 |
 | 查豆瓣电影 / 书评 | `douban` | 🚧 计划中（W08） |
-| 查中国天气 | `weather_cn` | 🚧 计划中（W06） |
 | 搜 HackerNews | `hackernews` | 🚧 计划中（W06） |
 | 总结 arXiv 论文（本地 LLM） | `arxiv_summary` | 🚧 计划中（W09） |
 | 查 Notion workspace | `notion_query` | 🚧 计划中（W11） |
@@ -190,6 +190,7 @@ MemoMate/
     ├── bilibili_search/        # 可用
     ├── zhihu_search/           # 可用
     ├── weather_cn/             # 可用
+    ├── github_trending/        # 可用
     └── wechat_mp/              # 脚手架
 ```
 
