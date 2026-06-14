@@ -20,6 +20,7 @@ Each server should:
 | [`bilibili_search`](bilibili_search/) | working | Search B站 videos + video info + subtitles transcript (stdlib only) |
 | [`zhihu_search`](zhihu_search/) | working | Search 知乎 questions/answers + fetch answer body (rate-limited, 24h cache) |
 | [`weather_cn`](weather_cn/) | working | Chinese-city weather + 3-day forecast via wttr.in (stdlib only, no key) |
+| [`github_trending`](github_trending/) | working | GitHub Trending repos, daily/weekly/monthly + language filter (stdlib only) |
 | [`wechat_mp`](wechat_mp/) | scaffold | Fetch public 微信公众号 article content |
 
 ## Why one-folder-per-server?
