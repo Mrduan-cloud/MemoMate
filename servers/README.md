@@ -24,7 +24,7 @@ Each server should:
 | [`weather_cn`](weather_cn/) | working | Chinese-city weather + 3-day forecast via wttr.in (stdlib only, no key) |
 | [`github_trending`](github_trending/) | working | GitHub Trending repos, daily/weekly/monthly + language filter (stdlib only) |
 | [`hackernews`](hackernews/) | working | Hacker News 榜单 (top/new/best/ask/show/job) + 全文检索 (official API + Algolia, stdlib only) |
-| [`wechat_mp`](wechat_mp/) | scaffold | Fetch public 微信公众号 article content |
+| [`wechat_mp`](wechat_mp/) | working | 解析公开微信公众号文章 (标题/公众号/作者/时间/正文, stdlib only) |
 
 ## Why one-folder-per-server?
 
