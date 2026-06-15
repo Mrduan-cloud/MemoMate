@@ -103,9 +103,26 @@ def test_parse_truncated_falls_back():
     ("", ""),
     ("not-a-number", ""),
     (None, ""),
+    ("999999999999999999", ""),           # 超大 epoch → gmtime 越界,兜住返回 ""(不崩)
+    ("9" * 30, ""),
 ])
 def test_format_publish_time(ct, expected):
     assert _format_publish_time(ct) == expected
+
+
+def test_parse_oversized_ct_does_not_crash():
+    # ct 来自页面,超大数不应让 parse_article 抛异常(页面可控的崩溃面)
+    html = '<meta property="og:title" content="T" /><script>var ct = "99999999999999999999";</script>'
+    d = parse_article(html, url="u")
+    assert d["publish_time"] == "" and d["error"] is None and d["title"] == "T"
+
+
+def test_fetch_never_raises_on_parser_error(monkeypatch):
+    import servers.wechat_mp.server as srv
+    monkeypatch.setattr(srv, "_fetch_html", lambda url, timeout=20.0: "<html>x</html>")
+    monkeypatch.setattr(srv, "parse_article", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("boom")))
+    d = srv.fetch_wechat_article("https://mp.weixin.qq.com/s/x")
+    assert d["error"] is not None and d["title"] == ""   # 解析异常被兜成降级,不冒泡
 
 
 # ---------- _html_to_text / _extract_body ----------
