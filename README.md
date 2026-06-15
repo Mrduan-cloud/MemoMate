@@ -33,7 +33,7 @@ MemoMate 是**一个项目里的两件事**：
 | [`weather_cn`](servers/weather_cn/) | 可用 | 中文城市天气 + 3 天预报，wttr.in 免 key（零依赖） |
 | [`github_trending`](servers/github_trending/) | 可用 | GitHub 热门仓库 daily/weekly/monthly + 语言过滤（零依赖） |
 | [`hackernews`](servers/hackernews/) | 可用 | Hacker News 榜单（top/new/best/ask/show/job）+ 全文检索（官方 API + Algolia，零依赖） |
-| [`wechat_mp`](servers/wechat_mp/) | 脚手架 | 读取公开的微信公众号文章 |
+| [`wechat_mp`](servers/wechat_mp/) | 可用 | 解析公开微信公众号文章：标题/公众号/作者/时间/正文（零依赖） |
 
 每个 server 是一个独立的目录。新 server 按每日迭代节奏陆续上线。**一页速查（每个 server 一句话 + 3 个示例 prompt）见 [`SERVERS.md`](SERVERS.md)。**
 
@@ -58,7 +58,7 @@ MemoMate 是**一个项目里的两件事**：
 | 查 arXiv 论文 | `arxiv_search` | ✅ 可用 |
 | 搜知乎技术回答 | `zhihu_search` | ✅ 可用 |
 | 查城市天气 / 出行参考 | `weather_cn` | ✅ 可用 |
-| 读公众号长文 | `wechat_mp` | 🚧 计划中 |
+| 读公众号长文 | `wechat_mp` | ✅ 可用 |
 | 查火车票 / 排班 | `12306` | 🚧 计划中（W07） |
 | 看 GitHub 热门 | `github_trending` | ✅ 可用 |
 | 刷 Hacker News / 搜 HN 帖 | `hackernews` | ✅ 可用 |
@@ -194,7 +194,7 @@ MemoMate/
     ├── weather_cn/             # 可用
     ├── github_trending/        # 可用
     ├── hackernews/             # 可用
-    └── wechat_mp/              # 脚手架
+    └── wechat_mp/              # 可用
 ```
 
 ### Memory 工具（`core/`）

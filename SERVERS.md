@@ -13,8 +13,9 @@
 | [`weather_cn`](servers/weather_cn/) | `memomate-weather` | 中文城市天气 + 3 天预报,wttr.in 免 key(零依赖) |
 | [`github_trending`](servers/github_trending/) | `memomate-github-trending` | GitHub 热门仓库 daily/weekly/monthly + 语言过滤(零依赖) |
 | [`hackernews`](servers/hackernews/) | `memomate-hackernews` | Hacker News 榜单 + 全文检索,官方 API + Algolia(零依赖) |
+| [`wechat_mp`](servers/wechat_mp/) | `memomate-wechat-mp` | 解析公开微信公众号文章:标题/公众号/作者/时间/正文(零依赖) |
 
-> 另有 [`core`](core/)(可选记忆 server,SQLite + FTS5,5 个工具)与 [`wechat_mp`](servers/wechat_mp/)(脚手架,计划中)。
+> 另有 [`core`](core/)(可选记忆 server,SQLite + FTS5,5 个工具)。
 
 ---
 
@@ -65,3 +66,11 @@
 - *"看看 Hacker News 今天的热门帖子前 10。"*
 - *"用 memomate-hackernews 查 Ask HN 最新都在聊什么。"*
 - *"Search Hacker News for posts about Rust async runtimes."*
+
+## wechat_mp — 微信公众号文章
+
+`fetch_wechat_article(url)`(给定公开文章链接 → 标题/公众号/作者/发布时间/正文纯文本)。
+
+- *"帮我把这篇公众号文章读出来:https://mp.weixin.qq.com/s/xxxx"*
+- *"用 memomate-wechat-mp 取一下这篇推文的标题、公众号和正文。"*
+- *"Summarize this WeChat article: <mp.weixin.qq.com link>。"*
