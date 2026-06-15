@@ -59,6 +59,20 @@ def test_is_wechat_article_url(url, ok):
     assert is_wechat_article_url(url) is ok
 
 
+@pytest.mark.parametrize("url", [
+    "http://169.254.169.254/mp.weixin.qq.com/s/x",   # 子串绕过 → 抓云元数据
+    "http://localhost/mp.weixin.qq.com/s",
+    "http://evil.com/?x=mp.weixin.qq.com/s",
+    "http://evil.com/#mp.weixin.qq.com/s/x",
+    "https://mp.weixin.qq.com.evil.com/s/x",          # 子域名伪装
+    "ftp://mp.weixin.qq.com/s/x",                     # 非 http(s)
+    "http://mp.weixin.qq.com/about",                  # 合法 host 但非文章路径
+])
+def test_url_validation_blocks_ssrf_and_non_article(url):
+    # host 必须严格等于 mp.weixin.qq.com 且路径 /s,堵死子串绕过型 SSRF
+    assert is_wechat_article_url(url) is False
+
+
 # ---------- parse_article 完整页 ----------
 def test_parse_full_page():
     d = parse_article(_FULL, url="u")

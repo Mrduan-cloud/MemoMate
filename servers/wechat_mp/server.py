@@ -22,6 +22,7 @@ import http.client
 import re
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 from mcp.server.fastmcp import FastMCP
@@ -59,8 +60,17 @@ _limiter = _RateLimiter(1.0)
 
 # ============ 纯函数(离线可单测) ============
 def is_wechat_article_url(url: str) -> bool:
-    u = (url or "").strip().lower()
-    return u.startswith(("http://", "https://")) and "mp.weixin.qq.com/s" in u
+    """是否合法的微信文章链接。**也是 SSRF 边界**:必须严格校验 host==mp.weixin.qq.com,
+    不能用子串匹配——否则 http://169.254.169.254/mp.weixin.qq.com/s 之类会绕过去抓内网。"""
+    try:
+        p = urllib.parse.urlparse((url or "").strip())
+    except ValueError:
+        return False
+    return (
+        p.scheme in ("http", "https")
+        and p.hostname == "mp.weixin.qq.com"
+        and (p.path == "/s" or p.path.startswith("/s/"))
+    )
 
 
 def _meta(html_text: str, prop: str) -> str:
