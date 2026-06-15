@@ -106,10 +106,17 @@ def _extract_body(html_text: str) -> str:
 
 
 def _format_publish_time(ct: str | None) -> str:
-    """微信 ct(发布时刻 Unix 秒)→ 北京时间 'YYYY-MM-DD HH:MM'。非法返回空串。"""
+    """微信 ct(发布时刻 Unix 秒)→ 北京时间 'YYYY-MM-DD HH:MM'。非法/越界返回空串。
+
+    ct 来自页面内容(``\\d+``),可能是超大数 → gmtime 会 OverflowError/OSError,必须兜住,
+    否则会从 parse_article 一路冒泡出工具,破坏优雅降级契约。
+    """
     if not ct or not str(ct).isdigit():
         return ""
-    return time.strftime("%Y-%m-%d %H:%M", time.gmtime(int(ct) + 8 * 3600))
+    try:
+        return time.strftime("%Y-%m-%d %H:%M", time.gmtime(int(ct) + 8 * 3600))
+    except (ValueError, OverflowError, OSError):
+        return ""
 
 
 def _publish_epoch(html_text: str) -> str:
@@ -190,7 +197,11 @@ def fetch_wechat_article(url: str) -> dict:
     html_text = _fetch_html(url.strip())
     if html_text is None:
         return _error(url, "抓取失败(网络错误)")
-    return parse_article(html_text, url=url.strip())
+    # 兜底:解析层任何意外异常都不该冒泡给 MCP client(优雅降级契约)
+    try:
+        return parse_article(html_text, url=url.strip())
+    except Exception as e:  # noqa: BLE001 — 工具边界刻意全捕,降级而非崩
+        return _error(url, f"解析异常:{type(e).__name__}")
 
 
 def main() -> None:
