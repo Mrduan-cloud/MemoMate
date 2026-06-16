@@ -25,6 +25,7 @@ Each server should:
 | [`github_trending`](github_trending/) | working | GitHub Trending repos, daily/weekly/monthly + language filter (stdlib only) |
 | [`hackernews`](hackernews/) | working | Hacker News 榜单 (top/new/best/ask/show/job) + 全文检索 (official API + Algolia, stdlib only) |
 | [`wechat_mp`](wechat_mp/) | working | 解析公开微信公众号文章 (标题/公众号/作者/时间/正文, stdlib only) |
+| [`stackoverflow`](stackoverflow/) | working | Search Stack Overflow questions + fetch answer bodies (official Stack Exchange API, no key, stdlib only) |
 
 ## Why one-folder-per-server?
 
