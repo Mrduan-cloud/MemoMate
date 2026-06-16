@@ -49,6 +49,8 @@ _SORT_ALIASES = {
 _TAG_RE = re.compile(r"<[^>]+>")
 _BLOCK_RE = re.compile(r"<(?:p|div|section|br|h[1-6]|li|tr|pre|blockquote)\b[^>]*>", re.IGNORECASE)
 _SCRIPT_STYLE_RE = re.compile(r"<(script|style)\b[^>]*>.*?</\1>", re.IGNORECASE | re.DOTALL)
+_PRE_RE = re.compile(r"<pre\b[^>]*>(.*?)</pre>", re.IGNORECASE | re.DOTALL)
+_PRE_PLACEHOLDER_RE = re.compile("\x00PRE(\\d+)\x00")
 
 
 class _RateLimiter:
@@ -117,20 +119,39 @@ def _humanize_age(seconds: float | None) -> str | None:
     return f"{s // 86400}d"
 
 
+def _strip_pre_inner(inner: str) -> str:
+    """``<pre>`` 块内文本:去内层标签(如 ``<code>``)、解实体,但**保留缩进与换行**。
+
+    代码答案靠行首缩进表意(Python/YAML 尤甚),故只 strip 首尾空行,绝不折叠行内空白。
+    """
+    return html.unescape(_TAG_RE.sub("", inner)).strip("\n")
+
+
 def _html_to_text(fragment: str) -> str:
     """答案正文 HTML → 可读纯文本:去脚本/样式、块级标签转换行、去残留标签、解实体、压空白。
 
-    SO 代码块是 ``<pre><code>...\\n...</code></pre>``,内部 ``\\n`` 为真实换行会被保留;
-    块级标签前补换行让段落/列表/代码块不黏连。
+    关键:**先把 ``<pre>`` 代码块挖出来占位**,再对其余正文压空白——否则后面的
+    ``[ \\t]+→空格`` / ``行首空白剥除`` 会把代码缩进吃光(SO 是代码站,缩进必须留)。
+    占位符用 ``\\x00`` 哨兵(HTML 文本里不会出现),不会被标签正则/空白折叠误伤。
     """
     s = _SCRIPT_STYLE_RE.sub(" ", fragment or "")
+
+    blocks: list[str] = []
+
+    def _stash(m: re.Match[str]) -> str:
+        blocks.append(_strip_pre_inner(m.group(1)))
+        return f"\n\x00PRE{len(blocks) - 1}\x00\n"
+
+    s = _PRE_RE.sub(_stash, s)
     s = _BLOCK_RE.sub("\n", s)
     s = _TAG_RE.sub("", s)
     s = html.unescape(s)
     s = re.sub(r"[ \t]+", " ", s)
     s = re.sub(r"\n[ \t]+", "\n", s)
     s = re.sub(r"\n{3,}", "\n\n", s)
-    return s.strip()
+    s = s.strip()
+    # 还原代码块(其缩进未经折叠)
+    return _PRE_PLACEHOLDER_RE.sub(lambda m: blocks[int(m.group(1))], s)
 
 
 def _normalize_question(raw: dict | None, now_epoch: float) -> dict | None:

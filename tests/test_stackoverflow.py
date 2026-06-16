@@ -120,6 +120,33 @@ def test_html_to_text_entities_and_empty() -> None:
     assert _html_to_text("<script>evil()</script>hi") == "hi"
 
 
+def test_html_to_text_preserves_code_indentation() -> None:
+    """回归:<pre> 代码块的行首缩进必须保留(SO 是代码站,缩进有语义)。"""
+    body = ('<p>Define it:</p>\n'
+            '<pre class="lang-py"><code>def foo():\n'
+            '    if x:\n'
+            '        return 1\n'
+            '    return 0\n'
+            '</code></pre>')
+    out = _html_to_text(body)
+    assert out.startswith("Define it:")        # 段落文字仍正常归一
+    assert "def foo():" in out
+    assert "\n    if x:" in out                 # 4-space 缩进保留
+    assert "\n        return 1" in out          # 8-space 缩进保留
+    assert "<pre>" not in out and "<code>" not in out
+
+
+def test_html_to_text_pre_unescapes_and_multiple_blocks() -> None:
+    """<pre> 内实体解码 + 缩进保留 + 多个代码块都各自还原。"""
+    body = ("<pre><code>if a &lt; b:\n    x &amp;= 1</code></pre>\n"
+            "<p>then</p>\n<pre><code>y = 2</code></pre>")
+    out = _html_to_text(body)
+    assert "if a < b:" in out                   # 实体 &lt; → <
+    assert "\n    x &= 1" in out                # 缩进保留 + &amp; → &
+    assert "then" in out
+    assert "y = 2" in out
+
+
 # ---------- _normalize_question ----------
 def test_normalize_question_accepted() -> None:
     q = _normalize_question(_Q_ACCEPTED, now_epoch=_Q_ACCEPTED["creation_date"] + 7200)
