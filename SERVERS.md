@@ -14,6 +14,7 @@
 | [`github_trending`](servers/github_trending/) | `memomate-github-trending` | GitHub 热门仓库 daily/weekly/monthly + 语言过滤(零依赖) |
 | [`hackernews`](servers/hackernews/) | `memomate-hackernews` | Hacker News 榜单 + 全文检索,官方 API + Algolia(零依赖) |
 | [`wechat_mp`](servers/wechat_mp/) | `memomate-wechat-mp` | 解析公开微信公众号文章:标题/公众号/作者/时间/正文(零依赖) |
+| [`stackoverflow`](servers/stackoverflow/) | `memomate-stackoverflow` | 搜 Stack Overflow 问题 + 取答案正文,官方 API 免 key(零依赖) |
 
 > 另有 [`core`](core/)(可选记忆 server,SQLite + FTS5,5 个工具)。
 
@@ -74,3 +75,11 @@
 - *"帮我把这篇公众号文章读出来:https://mp.weixin.qq.com/s/xxxx"*
 - *"用 memomate-wechat-mp 取一下这篇推文的标题、公众号和正文。"*
 - *"Summarize this WeChat article: <mp.weixin.qq.com link>。"*
+
+## stackoverflow — Stack Overflow 问答
+
+`search_stackoverflow(query, tag="", limit=10, sort="relevance")` / `get_stackoverflow_answers(question_id, limit=3)`(官方 Stack Exchange API,免 key)。
+
+- *"在 Stack Overflow 搜搜 `asyncio gather` 怎么用,给我几个高票问题。"*
+- *"用 memomate-stackoverflow 查 rust 标签下 tokio 运行时相关的高赞问题。"*
+- *"把这个 SO 问题的被采纳答案正文取出来:question_id=11236129。"*

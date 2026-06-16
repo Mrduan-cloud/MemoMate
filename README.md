@@ -59,13 +59,13 @@ MemoMate 是**一个项目里的两件事**：
 | 搜知乎技术回答 | `zhihu_search` | ✅ 可用 |
 | 查城市天气 / 出行参考 | `weather_cn` | ✅ 可用 |
 | 读公众号长文 | `wechat_mp` | ✅ 可用 |
-| 查火车票 / 排班 | `12306` | 🚧 计划中（W07） |
+| 查火车票 / 排班 | `12306` | 🚧 计划中 |
 | 看 GitHub 热门 | `github_trending` | ✅ 可用 |
 | 刷 Hacker News / 搜 HN 帖 | `hackernews` | ✅ 可用 |
-| 查豆瓣电影 / 书评 | `douban` | 🚧 计划中（W08） |
-| 搜 HackerNews | `hackernews` | 🚧 计划中（W06） |
+| 查 Stack Overflow 问答 | `stackoverflow` | ✅ 可用 |
+| 查豆瓣电影 / 书评 | `douban` | 🚧 计划中 |
 | 总结 arXiv 论文（本地 LLM） | `arxiv_summary` | 🚧 计划中（W09） |
-| 查 Notion workspace | `notion_query` | 🚧 计划中（W11） |
+| 查 Notion workspace | `notion_query` | 🚧 计划中 |
 
 如果你正在用 **Trae / CodeBuddy / 通义灵码 IDE / Cursor / Claude Code**，并且想让 AI 帮你 *"找一下 B 站讲 LangGraph 的视频"* 或者 *"搜知乎上关于 RAG 评测的回答"* —— MemoMate 就是为你做的。
 
@@ -194,7 +194,8 @@ MemoMate/
     ├── weather_cn/             # 可用
     ├── github_trending/        # 可用
     ├── hackernews/             # 可用
-    └── wechat_mp/              # 可用
+    ├── wechat_mp/              # 可用
+    └── stackoverflow/          # 可用
 ```
 
 ### Memory 工具（`core/`）
