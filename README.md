@@ -34,6 +34,7 @@ MemoMate 是**一个项目里的两件事**：
 | [`github_trending`](servers/github_trending/) | 可用 | GitHub 热门仓库 daily/weekly/monthly + 语言过滤（零依赖） |
 | [`hackernews`](servers/hackernews/) | 可用 | Hacker News 榜单（top/new/best/ask/show/job）+ 全文检索（官方 API + Algolia，零依赖） |
 | [`wechat_mp`](servers/wechat_mp/) | 可用 | 解析公开微信公众号文章：标题/公众号/作者/时间/正文（零依赖） |
+| [`stackoverflow`](servers/stackoverflow/) | 可用 | 搜 Stack Overflow 问题 + 取答案正文，官方 Stack Exchange API 免 key（零依赖） |
 
 每个 server 是一个独立的目录。新 server 按每日迭代节奏陆续上线。**一页速查（每个 server 一句话 + 3 个示例 prompt）见 [`SERVERS.md`](SERVERS.md)。**
 

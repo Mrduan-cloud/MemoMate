@@ -19,6 +19,8 @@ MemoMate is **two things in one project**:
 
 Together they demonstrate end-to-end MCP development: breadth (many tools) and depth (one stateful, exportable store).
 
+> 🌐 **Project landing page (single-file static site):** [`docs/index.html`](docs/index.html) — double-click to open it locally; or publish it as a public site in one click via the repo's **Settings → Pages → Source: `main` / `/docs`**.
+
 ---
 
 ## The servers (`servers/`) — main attraction
