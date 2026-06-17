@@ -26,11 +26,15 @@ Together they demonstrate end-to-end MCP development: breadth (many tools) and d
 | Server | Status | What it does |
 |---|---|---|
 | [`arxiv_search`](servers/arxiv_search/) | working | Search arXiv papers via the public Atom API (zero dependencies) |
-| [`bilibili_search`](servers/bilibili_search/) | working | Search Bilibili (B站) videos + fetch video info (zero dependencies) |
-| [`zhihu_search`](servers/zhihu_search/) | scaffold | Search Zhihu (知乎) questions & answers |
-| [`wechat_mp`](servers/wechat_mp/) | scaffold | Read public WeChat MP (微信公众号) articles |
+| [`bilibili_search`](servers/bilibili_search/) | working | Search Bilibili (B站) videos + fetch video info & subtitle transcripts (zero dependencies) |
+| [`zhihu_search`](servers/zhihu_search/) | working | Search Zhihu (知乎) questions & answers + fetch answer text (zero dependencies) |
+| [`weather_cn`](servers/weather_cn/) | working | Chinese-city weather + 3-day forecast via wttr.in, no API key (zero dependencies) |
+| [`github_trending`](servers/github_trending/) | working | GitHub trending repos (daily/weekly/monthly) + language filter (zero dependencies) |
+| [`hackernews`](servers/hackernews/) | working | Hacker News stories (top/new/best/ask/show/job) + full-text search (official API + Algolia, zero dependencies) |
+| [`wechat_mp`](servers/wechat_mp/) | working | Parse public WeChat MP (微信公众号) articles: title/account/author/date/body text (zero dependencies) |
+| [`stackoverflow`](servers/stackoverflow/) | working | Search Stack Overflow questions + fetch answer text via the official Stack Exchange API, no key (zero dependencies) |
 
-Each server is a self-contained folder. New servers ship as part of the daily iteration plan.
+Each server is a self-contained folder. New servers ship as part of the daily iteration plan. **For a one-page cheat sheet (one line + 3 example prompts per server), see [`SERVERS.md`](SERVERS.md).**
 
 For setup instructions across all IDEs (Cursor, Claude Code, Trae, CodeBuddy, Lingma IDE, ...), see **[Plug into your AI IDE](#plug-into-your-ai-ide)** below.
 
@@ -51,15 +55,16 @@ International AI coding tools (Cursor, Claude Code, Cline) excel at code generat
 |---|---|---|
 | Find Bilibili video tutorials | `bilibili_search` | working |
 | Query arXiv papers | `arxiv_search` | working |
-| Search Zhihu technical answers | `zhihu_search` | planned (W03) |
-| Read long-form WeChat MP articles | `wechat_mp` | planned (W04) |
-| Train schedules / availability | `12306` | planned (W07) |
-| GitHub trending | `github_trending` | planned (W06) |
-| Douban movie / book ratings | `douban` | planned (W08) |
-| Chinese-city weather | `weather_cn` | planned (W06) |
-| HackerNews top stories | `hackernews` | planned (W06) |
+| Search Zhihu technical answers | `zhihu_search` | working |
+| Chinese-city weather / travel reference | `weather_cn` | working |
+| Read long-form WeChat MP articles | `wechat_mp` | working |
+| Train schedules / availability | `12306` | planned |
+| GitHub trending | `github_trending` | working |
+| HackerNews stories / search HN | `hackernews` | working |
+| Query Stack Overflow Q&A | `stackoverflow` | working |
+| Douban movie / book ratings | `douban` | planned |
 | Summarize an arXiv paper (local LLM) | `arxiv_summary` | planned (W09) |
-| Query a Notion workspace | `notion_query` | planned (W11) |
+| Query a Notion workspace | `notion_query` | planned |
 
 If you use **Trae / CodeBuddy / Lingma IDE / Cursor / Claude Code** and want your AI to *"find LangGraph tutorial videos on Bilibili"* or *"search Zhihu for RAG evaluation answers"* — MemoMate is built exactly for you.
 
@@ -183,8 +188,12 @@ MemoMate/
 └── servers/                    # Utility MCP Servers (the main draw)
     ├── arxiv_search/           # working
     ├── bilibili_search/        # working
-    ├── zhihu_search/           # scaffold
-    └── wechat_mp/              # scaffold
+    ├── zhihu_search/           # working
+    ├── weather_cn/             # working
+    ├── github_trending/        # working
+    ├── hackernews/             # working
+    ├── wechat_mp/              # working
+    └── stackoverflow/          # working
 ```
 
 ### Memory tools (`core/`)
