@@ -117,6 +117,57 @@ claude mcp add memomate-bilibili --scope user \
 
 ---
 
+## Remote access: Streamable HTTP
+
+By default every server runs over **stdio** — the IDE spawns a local subprocess, with no network surface and zero config (that's what every setup example above uses).
+
+As of this release, **the same servers can also run over HTTP**, enabling **remote access** and **multiple clients sharing one process**. The transport is chosen at launch via a CLI flag / environment variable, and **stdio stays the default** — existing stdio configs need no change.
+
+The primary transport is [**Streamable HTTP**](https://modelcontextprotocol.io/specification) (the 2025 MCP spec's standard remote transport; the older HTTP+SSE is deprecated by the spec but kept as `--transport sse`).
+
+```bash
+# Run the core memory server over Streamable HTTP (defaults to 127.0.0.1:8000, path /mcp)
+uv run memomate-core --transport streamable-http
+
+# Custom host / port / path
+uv run memomate-core --transport streamable-http --host 0.0.0.0 --port 9000 --path /memory
+
+# Any utility server works the same way
+uv run memomate-stackoverflow --transport streamable-http --port 8001
+```
+
+Environment variables work too (CLI flags take precedence):
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `MEMOMATE_TRANSPORT` | `stdio` / `streamable-http` / `sse` | `stdio` |
+| `MEMOMATE_HOST` | HTTP bind address | `127.0.0.1` |
+| `MEMOMATE_PORT` | HTTP bind port | `8000` |
+| `MEMOMATE_HTTP_PATH` | HTTP mount path | `/mcp` (`/sse` for SSE) |
+
+**Connecting a client to an HTTP server** (Claude Code shown):
+
+```bash
+claude mcp add --transport http memomate-core http://127.0.0.1:8000/mcp
+```
+
+Or, anywhere `mcpServers` is accepted, use the URL form (field names vary slightly by client):
+
+```json
+{
+  "mcpServers": {
+    "memomate-core": {
+      "type": "http",
+      "url": "http://127.0.0.1:8000/mcp"
+    }
+  }
+}
+```
+
+> ⚠️ The default bind is `127.0.0.1` (local only). The core memory server ships with no authentication — if you expose it beyond localhost, put it behind a reverse proxy + auth and only open it to trusted networks.
+
+---
+
 ## The memory store (`core/`) — opinionated alternative
 
 A long-term memory MCP Server backed by SQLite + FTS5. Storage lives in a single file at `~/.memomate/memories.db` that you can:
@@ -186,7 +237,8 @@ See **[Plug into your AI IDE](#plug-into-your-ai-ide)** above for full instructi
 MemoMate/
 ├── core/                       # Memory MCP Server (opinionated, optional)
 │   ├── server.py               # FastMCP server, 5 tools
-│   └── store.py                # SQLite + FTS5 storage (WAL mode for concurrent clients)
+│   └── store.py                # SQLite + FTS5 storage (WAL + thread-safe; concurrent clients/threads)
+├── runtime/                    # Shared transport layer: every server picks stdio / Streamable HTTP / SSE via run_server()
 └── servers/                    # Utility MCP Servers (the main draw)
     ├── arxiv_search/           # working
     ├── bilibili_search/        # working

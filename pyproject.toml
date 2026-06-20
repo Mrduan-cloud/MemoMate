@@ -8,7 +8,10 @@ readme = "README.md"
 license = { text = "MIT" }
 keywords = ["mcp", "memory", "agent", "llm", "rag"]
 dependencies = [
-    "mcp>=1.2.0",
+    # Streamable HTTP / SSE transports (runtime/transport.py) need a recent
+    # FastMCP. mcp bundles starlette + uvicorn as core deps, so no HTTP extra
+    # is required.
+    "mcp>=1.12.0",
 ]
 
 [project.optional-dependencies]
@@ -34,7 +37,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["core", "servers"]
+packages = ["core", "runtime", "servers"]
 
 [tool.ruff]
 line-length = 100

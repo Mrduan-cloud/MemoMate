@@ -24,6 +24,8 @@ from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 
+from runtime import run_server
+
 mcp = FastMCP("memomate-weather-cn")
 
 _BASE = "https://wttr.in"
@@ -234,8 +236,8 @@ def get_forecast(city: str, days: int = 3) -> dict[str, Any]:
 
 
 def main() -> None:
-    """Entry point for the weather MCP server (stdio transport)."""
-    mcp.run()
+    """Entry point for the weather MCP server (stdio by default; --transport streamable-http for remote access)."""
+    run_server(mcp)
 
 
 if __name__ == "__main__":

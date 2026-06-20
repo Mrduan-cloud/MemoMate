@@ -12,6 +12,8 @@ from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 
+from runtime import run_server
+
 mcp = FastMCP("memomate-arxiv-search")
 
 ARXIV_API = "https://export.arxiv.org/api/query"
@@ -110,8 +112,8 @@ def search_arxiv(
 
 
 def main() -> None:
-    """Entry point for the arXiv search MCP server (stdio transport)."""
-    mcp.run()
+    """Entry point for the arXiv search MCP server (stdio by default; --transport streamable-http for remote access)."""
+    run_server(mcp)
 
 
 if __name__ == "__main__":

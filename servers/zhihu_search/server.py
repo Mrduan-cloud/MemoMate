@@ -28,6 +28,7 @@ from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 
+from runtime import run_server
 from servers.zhihu_search.cache import ResultCache, cache_key
 
 mcp = FastMCP("memomate-zhihu-search")
@@ -243,8 +244,8 @@ def fetch_answer(answer_id: str) -> dict[str, Any]:
 
 
 def main() -> None:
-    """Entry point for the 知乎 search MCP server (stdio transport)."""
-    mcp.run()
+    """Entry point for the 知乎 search MCP server (stdio by default; --transport streamable-http for remote access)."""
+    run_server(mcp)
 
 
 if __name__ == "__main__":

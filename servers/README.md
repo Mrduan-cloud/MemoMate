@@ -7,7 +7,7 @@ A growing collection of small, focused MCP Servers. Each subfolder is one indepe
 Each server should:
 
 1. Live in its own folder under `servers/<server_name>/`.
-2. Have a `server.py` exposing `mcp = FastMCP(...)` and a `main()` entry point.
+2. Have a `server.py` exposing `mcp = FastMCP(...)` and a `main()` entry point that calls `run_server(mcp)` (from `runtime`), so it inherits the stdio + Streamable HTTP / SSE transports for free.
 3. Have a `__main__.py` so `python -m servers.<name>` works.
 4. Have its own `README.md` describing tools, examples, env vars.
 5. Be registered in `pyproject.toml` under `[project.scripts]` as `memomate-<name>`.

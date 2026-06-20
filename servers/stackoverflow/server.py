@@ -30,6 +30,8 @@ import urllib.request
 
 from mcp.server.fastmcp import FastMCP
 
+from runtime import run_server
+
 mcp = FastMCP("memomate-stackoverflow")
 
 _UA = "memomate-stackoverflow/0.1 (+https://github.com/Mrduan-cloud)"
@@ -275,8 +277,8 @@ def get_stackoverflow_answers(question_id: int, limit: int = 3) -> list[dict]:
 
 
 def main() -> None:
-    """Entry point for the Stack Overflow MCP server (stdio transport)."""
-    mcp.run()
+    """Entry point for the Stack Overflow MCP server (stdio by default; --transport streamable-http for remote access)."""
+    run_server(mcp)
 
 
 if __name__ == "__main__":
