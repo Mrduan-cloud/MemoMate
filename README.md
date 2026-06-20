@@ -117,6 +117,57 @@ claude mcp add memomate-bilibili --scope user \
 
 ---
 
+## 远程接入：Streamable HTTP
+
+默认情况下，每个 server 都跑在 **stdio** 上 —— 由 IDE 拉起一个本地子进程，零网络面、零配置（上面所有接入示例都是这种方式）。
+
+从这一版起，**同一个 server 也可以跑在 HTTP 上**，从而支持**远程接入**与**多客户端共享同一进程**。传输层在启动时按 CLI flag / 环境变量选择，**stdio 仍是默认** —— 已有的 stdio 配置无需任何改动。
+
+主推 [**Streamable HTTP**](https://modelcontextprotocol.io/specification)（MCP 2025 规范的标准远程传输；旧的 HTTP+SSE 已被规范弃用，但仍作为 `--transport sse` 保留）。
+
+```bash
+# 把 core 记忆 server 跑在 Streamable HTTP 上（默认绑 127.0.0.1:8000，路径 /mcp）
+uv run memomate-core --transport streamable-http
+
+# 自定义监听地址 / 端口 / 路径
+uv run memomate-core --transport streamable-http --host 0.0.0.0 --port 9000 --path /memory
+
+# 任何工具 server 同理
+uv run memomate-stackoverflow --transport streamable-http --port 8001
+```
+
+也可以用环境变量（CLI flag 优先级更高）：
+
+| 变量 | 作用 | 默认 |
+|---|---|---|
+| `MEMOMATE_TRANSPORT` | `stdio` / `streamable-http` / `sse` | `stdio` |
+| `MEMOMATE_HOST` | HTTP 监听地址 | `127.0.0.1` |
+| `MEMOMATE_PORT` | HTTP 监听端口 | `8000` |
+| `MEMOMATE_HTTP_PATH` | HTTP 挂载路径 | `/mcp`（SSE 为 `/sse`） |
+
+**客户端接入 HTTP server**（以 Claude Code 为例）：
+
+```bash
+claude mcp add --transport http memomate-core http://127.0.0.1:8000/mcp
+```
+
+或在接受 `mcpServers` 的客户端里用 URL 形式（字段名各客户端略有差异）：
+
+```json
+{
+  "mcpServers": {
+    "memomate-core": {
+      "type": "http",
+      "url": "http://127.0.0.1:8000/mcp"
+    }
+  }
+}
+```
+
+> ⚠️ 默认绑 `127.0.0.1`（仅本机）。core 记忆 server 本身不带认证 —— 真要对外暴露时，请自行套反向代理 + 鉴权，并只开放给可信网络。
+
+---
+
 ## core/ —— 可选的便携记忆服务器
 
 一个长期记忆 MCP 服务器，存储后端是 SQLite + FTS5。数据保存在单个文件 `~/.memomate/memories.db` 里，你可以：
@@ -187,7 +238,8 @@ uv run memomate-arxiv
 MemoMate/
 ├── core/                       # 记忆 MCP 服务器（可选）
 │   ├── server.py               # FastMCP 入口，5 个工具
-│   └── store.py                # SQLite + FTS5 存储（WAL 模式支持多客户端并发）
+│   └── store.py                # SQLite + FTS5 存储（WAL + 线程安全，支持多客户端 / 多线程并发）
+├── runtime/                    # 共享传输层：所有 server 经 run_server() 选 stdio / Streamable HTTP / SSE
 └── servers/                    # 工具 MCP 服务器（主角）
     ├── arxiv_search/           # 可用
     ├── bilibili_search/        # 可用

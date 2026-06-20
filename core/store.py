@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import sqlite3
+import threading
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -34,8 +35,14 @@ class MemoryStore:
     def __init__(self, db_path: Path | str | None = None) -> None:
         self.db_path = _resolve_db_path(db_path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        self._conn = sqlite3.connect(str(self.db_path), timeout=5.0)
+        # check_same_thread=False: under the HTTP transports, FastMCP dispatches
+        # sync tool handlers onto worker threads, so this connection is used from
+        # a different thread than the one that created it. `self._lock` serializes
+        # all access to keep that single shared connection safe; the WAL +
+        # busy_timeout pragmas below still cover the cross-process case.
+        self._conn = sqlite3.connect(str(self.db_path), timeout=5.0, check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
+        self._lock = threading.Lock()
         self._tune_for_concurrent_clients()
         self._init_schema()
 
@@ -113,53 +120,59 @@ class MemoryStore:
         source: str | None = None,
     ) -> int:
         tags_str = ",".join(tags) if tags else None
-        cur = self._conn.execute(
-            "INSERT INTO memories (content, tags, source, created_at) VALUES (?, ?, ?, ?)",
-            (content, tags_str, source, _now_iso()),
-        )
-        self._conn.commit()
-        return cur.lastrowid
-
-    def search(self, query: str, limit: int = 5) -> list[dict[str, Any]]:
-        cur = self._conn.execute(
-            """
-            SELECT m.id, m.content, m.tags, m.source, m.created_at, m.access_count
-              FROM memories_fts f
-              JOIN memories m ON m.id = f.rowid
-             WHERE memories_fts MATCH ?
-             ORDER BY rank
-             LIMIT ?
-            """,
-            (query, limit),
-        )
-        rows = [dict(r) for r in cur.fetchall()]
-        if rows:
-            ids = tuple(r["id"] for r in rows)
-            placeholders = ",".join("?" * len(ids))
-            self._conn.execute(
-                f"UPDATE memories SET access_count = access_count + 1, accessed_at = ? "
-                f"WHERE id IN ({placeholders})",
-                (_now_iso(), *ids),
+        with self._lock:
+            cur = self._conn.execute(
+                "INSERT INTO memories (content, tags, source, created_at) VALUES (?, ?, ?, ?)",
+                (content, tags_str, source, _now_iso()),
             )
             self._conn.commit()
-        return rows
+            return cur.lastrowid
+
+    def search(self, query: str, limit: int = 5) -> list[dict[str, Any]]:
+        with self._lock:
+            cur = self._conn.execute(
+                """
+                SELECT m.id, m.content, m.tags, m.source, m.created_at, m.access_count
+                  FROM memories_fts f
+                  JOIN memories m ON m.id = f.rowid
+                 WHERE memories_fts MATCH ?
+                 ORDER BY rank
+                 LIMIT ?
+                """,
+                (query, limit),
+            )
+            rows = [dict(r) for r in cur.fetchall()]
+            if rows:
+                ids = tuple(r["id"] for r in rows)
+                placeholders = ",".join("?" * len(ids))
+                self._conn.execute(
+                    f"UPDATE memories SET access_count = access_count + 1, accessed_at = ? "
+                    f"WHERE id IN ({placeholders})",
+                    (_now_iso(), *ids),
+                )
+                self._conn.commit()
+            return rows
 
     def list_recent(self, limit: int = 10) -> list[dict[str, Any]]:
-        cur = self._conn.execute(
-            "SELECT id, content, tags, source, created_at, access_count "
-            "FROM memories ORDER BY id DESC LIMIT ?",
-            (limit,),
-        )
-        return [dict(r) for r in cur.fetchall()]
+        with self._lock:
+            cur = self._conn.execute(
+                "SELECT id, content, tags, source, created_at, access_count "
+                "FROM memories ORDER BY id DESC LIMIT ?",
+                (limit,),
+            )
+            return [dict(r) for r in cur.fetchall()]
 
     def delete(self, memory_id: int) -> bool:
-        cur = self._conn.execute("DELETE FROM memories WHERE id = ?", (memory_id,))
-        self._conn.commit()
-        return cur.rowcount > 0
+        with self._lock:
+            cur = self._conn.execute("DELETE FROM memories WHERE id = ?", (memory_id,))
+            self._conn.commit()
+            return cur.rowcount > 0
 
     def count(self) -> int:
-        cur = self._conn.execute("SELECT COUNT(*) AS n FROM memories")
-        return cur.fetchone()["n"]
+        with self._lock:
+            cur = self._conn.execute("SELECT COUNT(*) AS n FROM memories")
+            return cur.fetchone()["n"]
 
     def close(self) -> None:
-        self._conn.close()
+        with self._lock:
+            self._conn.close()

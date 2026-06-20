@@ -27,6 +27,8 @@ import urllib.request
 
 from mcp.server.fastmcp import FastMCP
 
+from runtime import run_server
+
 mcp = FastMCP("memomate-wechat-mp")
 
 _UA = (
@@ -205,8 +207,8 @@ def fetch_wechat_article(url: str) -> dict:
 
 
 def main() -> None:
-    """Entry point for the WeChat MP MCP server (stdio transport)."""
-    mcp.run()
+    """Entry point for the WeChat MP MCP server (stdio by default; --transport streamable-http for remote access)."""
+    run_server(mcp)
 
 
 if __name__ == "__main__":

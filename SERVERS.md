@@ -4,6 +4,8 @@
 每个 server 独立可插拔,接入方式见各自目录下的 `README.md` 或主 [`README.md`](README.md#接入你的-ai-ide)。
 
 > 状态总览与「如何新增一个 server」见 [`servers/README.md`](servers/README.md)。
+>
+> 所有 server 默认走 stdio;加 `--transport streamable-http` 即可远程 / 多客户端接入,见 [README · 远程接入](README.md#远程接入streamable-http)。
 
 | Server | 入口 | 一句话 |
 |---|---|---|

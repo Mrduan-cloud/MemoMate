@@ -21,6 +21,8 @@ import urllib.request
 
 from mcp.server.fastmcp import FastMCP
 
+from runtime import run_server
+
 mcp = FastMCP("memomate-hackernews")
 
 _UA = "memomate-hackernews/0.1 (+https://github.com/Mrduan-cloud)"
@@ -218,8 +220,8 @@ def search_hackernews(query: str, limit: int = 15) -> list[dict]:
 
 
 def main() -> None:
-    """Entry point for the Hacker News MCP server (stdio transport)."""
-    mcp.run()
+    """Entry point for the Hacker News MCP server (stdio by default; --transport streamable-http for remote access)."""
+    run_server(mcp)
 
 
 if __name__ == "__main__":

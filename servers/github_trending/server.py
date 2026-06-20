@@ -20,6 +20,8 @@ import urllib.request
 
 from mcp.server.fastmcp import FastMCP
 
+from runtime import run_server
+
 mcp = FastMCP("memomate-github-trending")
 
 _UA = (
@@ -167,8 +169,8 @@ def get_github_trending(language: str = "", since: str = "daily", limit: int = 1
 
 
 def main() -> None:
-    """Entry point for the GitHub Trending MCP server (stdio transport)."""
-    mcp.run()
+    """Entry point for the GitHub Trending MCP server (stdio by default; --transport streamable-http for remote access)."""
+    run_server(mcp)
 
 
 if __name__ == "__main__":
