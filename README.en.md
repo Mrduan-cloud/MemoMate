@@ -117,20 +117,20 @@ claude mcp add memomate-bilibili --scope user \
 
 ---
 
-## Remote access: Streamable HTTP
+## HTTP transport: multiple clients, one server process
 
-By default every server runs over **stdio** — the IDE spawns a local subprocess, with no network surface and zero config (that's what every setup example above uses).
+By default every server runs over **stdio** — the IDE spawns a local subprocess, with no network surface and zero config (that's what every setup example above uses). **Each IDE spawns its own server subprocess.**
 
-As of this release, **the same servers can also run over HTTP**, enabling **remote access** and **multiple clients sharing one process**. The transport is chosen at launch via a CLI flag / environment variable, and **stdio stays the default** — existing stdio configs need no change.
+As of this release, **the same servers can also run over HTTP**, so multiple local clients (Claude Code + Cursor + Lingma IDE + your own agent…) can **share one server process — one set of in-memory state, one cache** — instead of each spawning their own. The transport is chosen at launch via a CLI flag / environment variable, and **stdio stays the default** — existing stdio configs need no change.
 
-The primary transport is [**Streamable HTTP**](https://modelcontextprotocol.io/specification) (the 2025 MCP spec's standard remote transport; the older HTTP+SSE is deprecated by the spec but kept as `--transport sse`).
+The implementation uses [**Streamable HTTP**](https://modelcontextprotocol.io/specification) (the MCP 2025 spec's standard HTTP transport; the older HTTP+SSE is deprecated by the spec but kept as `--transport sse`).
 
 ```bash
 # Run the core memory server over Streamable HTTP (defaults to 127.0.0.1:8000, path /mcp)
 uv run memomate-core --transport streamable-http
 
-# Custom host / port / path
-uv run memomate-core --transport streamable-http --host 0.0.0.0 --port 9000 --path /memory
+# Custom port / path (still localhost-only)
+uv run memomate-core --transport streamable-http --port 9000 --path /memory
 
 # Any utility server works the same way
 uv run memomate-stackoverflow --transport streamable-http --port 8001
@@ -164,7 +164,7 @@ Or, anywhere `mcpServers` is accepted, use the URL form (field names vary slight
 }
 ```
 
-> ⚠️ The default bind is `127.0.0.1` (local only). The core memory server ships with no authentication — if you expose it beyond localhost, put it behind a reverse proxy + auth and only open it to trusted networks.
+> ⚠️ **Designed for localhost only.** The HTTP transports let multiple clients share one server process on the same machine (instead of stdio spawning one subprocess per client); they are not intended for direct cross-host exposure. The core memory server has no authentication, and the underlying MCP SDK enables DNS-rebinding protection by default — only `127.0.0.1 / localhost / [::1]` Host headers are accepted. **If you really need cross-host access, put a reverse proxy with auth in front and keep the backend on `127.0.0.1`.**
 
 ---
 
