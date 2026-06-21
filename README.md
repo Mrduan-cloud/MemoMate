@@ -117,20 +117,20 @@ claude mcp add memomate-bilibili --scope user \
 
 ---
 
-## 远程接入：Streamable HTTP
+## HTTP 传输：多客户端共享一个进程
 
-默认情况下，每个 server 都跑在 **stdio** 上 —— 由 IDE 拉起一个本地子进程，零网络面、零配置（上面所有接入示例都是这种方式）。
+默认情况下，每个 server 都跑在 **stdio** 上 —— 由 IDE 拉起一个本地子进程，零网络面、零配置（上面所有接入示例都是这种方式）。**每个 IDE 各起一个 server 子进程**。
 
-从这一版起，**同一个 server 也可以跑在 HTTP 上**，从而支持**远程接入**与**多客户端共享同一进程**。传输层在启动时按 CLI flag / 环境变量选择，**stdio 仍是默认** —— 已有的 stdio 配置无需任何改动。
+从这一版起，**同一个 server 也可以跑在 HTTP 上**，让本机的多个客户端（Claude Code + Cursor + 通义灵码 + 自己写的 Agent……）**共享同一个 server 进程、同一份内存与缓存**，而不是各起一份。传输层在启动时按 CLI flag / 环境变量选择，**stdio 仍是默认** —— 已有的 stdio 配置无需任何改动。
 
-主推 [**Streamable HTTP**](https://modelcontextprotocol.io/specification)（MCP 2025 规范的标准远程传输；旧的 HTTP+SSE 已被规范弃用，但仍作为 `--transport sse` 保留）。
+实现采用 [**Streamable HTTP**](https://modelcontextprotocol.io/specification)（MCP 2025 规范的标准 HTTP 传输；旧的 HTTP+SSE 已被规范弃用，但仍作为 `--transport sse` 保留）。
 
 ```bash
 # 把 core 记忆 server 跑在 Streamable HTTP 上（默认绑 127.0.0.1:8000，路径 /mcp）
 uv run memomate-core --transport streamable-http
 
-# 自定义监听地址 / 端口 / 路径
-uv run memomate-core --transport streamable-http --host 0.0.0.0 --port 9000 --path /memory
+# 自定义端口 / 路径（仍只对本机暴露）
+uv run memomate-core --transport streamable-http --port 9000 --path /memory
 
 # 任何工具 server 同理
 uv run memomate-stackoverflow --transport streamable-http --port 8001
@@ -164,7 +164,7 @@ claude mcp add --transport http memomate-core http://127.0.0.1:8000/mcp
 }
 ```
 
-> ⚠️ 默认绑 `127.0.0.1`（仅本机）。core 记忆 server 本身不带认证 —— 真要对外暴露时，请自行套反向代理 + 鉴权，并只开放给可信网络。
+> ⚠️ **设计上只面向本机**：HTTP 传输用于本机多客户端共享同一个 server 进程（替代 stdio 每个 client 各起一个子进程），不为跨机直连暴露而设。core 记忆 server 没有认证；底层 MCP SDK 也默认开启 DNS-rebinding 保护、只放行 `127.0.0.1 / localhost / [::1]` 的 Host 头。**如果确有跨机访问需要，请套反向代理 + 鉴权，反代后端仍跑在 `127.0.0.1`。**
 
 ---
 

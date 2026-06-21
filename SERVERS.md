@@ -5,7 +5,7 @@
 
 > 状态总览与「如何新增一个 server」见 [`servers/README.md`](servers/README.md)。
 >
-> 所有 server 默认走 stdio;加 `--transport streamable-http` 即可远程 / 多客户端接入,见 [README · 远程接入](README.md#远程接入streamable-http)。
+> 所有 server 默认走 stdio;加 `--transport streamable-http` 即可让本机多客户端共享同一个 server 进程,见 [README · HTTP 传输](README.md#http-传输多客户端共享一个进程)。
 
 | Server | 入口 | 一句话 |
 |---|---|---|
